@@ -1,2 +1,6 @@
-package zettelkasten;public class Buzzword {
+package zettelkasten;
+
+public class Buzzword {
+
+
 }
