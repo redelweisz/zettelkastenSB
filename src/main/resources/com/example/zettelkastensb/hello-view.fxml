@@ -12,49 +12,54 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.25, 0.75" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #E6EEFF;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/20.0.1">
-  <items>
-      <AnchorPane prefHeight="398.0" prefWidth="158.0">
-         <children>
-            <Label alignment="CENTER" layoutX="7.0" prefHeight="16.0" prefWidth="146.0" text="ZETTELKASTEN" textAlignment="JUSTIFY">
-               <opaqueInsets>
-                  <Insets bottom="5.0" top="5.0" />
-               </opaqueInsets>
-            </Label>
-            <TextField alignment="CENTER" layoutY="14.0" prefHeight="24.0" prefWidth="159.0" promptText="search" style="-fx-background-color: #E6EEFF;">
-               <cursor>
-                  <Cursor fx:constant="TEXT" />
-               </cursor>
-               <effect>
-                  <InnerShadow />
-               </effect>
-            </TextField>
-            <HBox layoutY="374.0" prefHeight="24.0" prefWidth="159.0">
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <SplitPane dividerPositions="0.2, 0.8" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color: #E6EEFF;">
+        <items>
+            <AnchorPane prefHeight="798.0" prefWidth="256.0">
                <children>
-                  <Button mnemonicParsing="false" prefWidth="80.0" text="New Zettel">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Button>
-                  <Button mnemonicParsing="false" prefWidth="80.0" text="Delete Zettel">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Button>
+                  <Label alignment="CENTER" layoutX="7.0" prefHeight="16.0" prefWidth="256.0" text="ZETTELKASTEN" textAlignment="JUSTIFY">
+                     <opaqueInsets>
+                        <Insets bottom="5.0" top="5.0" />
+                     </opaqueInsets>
+                  </Label>
+                  <TextField alignment="CENTER" layoutY="14.0" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
+                     <cursor>
+                        <Cursor fx:constant="TEXT" />
+                     </cursor>
+                     <effect>
+                        <InnerShadow />
+                     </effect>
+                  </TextField>
+                  <HBox layoutX="1.0" layoutY="774.0" prefHeight="24.0" prefWidth="256.0">
+                     <children>
+                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#insertZettel" prefWidth="128.0" text="New Zettel">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                        <Button alignment="CENTER" mnemonicParsing="false" prefWidth="128.0" text="Delete Zettel">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-         </children>
-      </AnchorPane>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-         <children>
-            <TextField layoutY="-2.0" prefHeight="41.0" prefWidth="287.0" style="-fx-background-color: #E6EEFF;" text="HEADER ZETTEL #1312">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </TextField>
-            <TextArea layoutY="39.0" prefHeight="361.0" prefWidth="287.0" style="-fx-background-color: #E6EEFF;" wrapText="true" />
-         </children>
-      </AnchorPane>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="4.0" />
-  </items>
-</SplitPane>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <TextField layoutY="-2.0" prefHeight="41.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" text="HEADER ZETTEL #1312">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </TextField>
+                  <TextArea layoutY="39.0" prefHeight="762.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" wrapText="true" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="800.0" prefWidth="200.0" />
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

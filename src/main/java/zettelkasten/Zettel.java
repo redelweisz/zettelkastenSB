@@ -13,6 +13,13 @@ public class Zettel implements Serializable {
     private LocalDate date;
     private Buzzword buzzword;
 
+    public Zettel(String header, String text, LocalDate date, Buzzword buzzword) {
+        this.header = header;
+        this.text = text;
+        this.date = date;
+        this.buzzword = buzzword;
+    }
+
     public String getHeader() {
         return header;
     }
