@@ -12,20 +12,24 @@ import java.util.UUID;
 public class Zettel {
 
 
+
     private byte[] zettelId;
 
     private String header;
     private String text;
     private LocalDate date;
-    private ArrayList<Buzzword> buzzword;
+    public ArrayList<Buzzword> buzzword;
 
-    public Zettel(String header, String text, LocalDate date, ArrayList<Buzzword> buzzword) {
+    public Zettel(LocalDate date, ArrayList<Buzzword> buzzword) {
         this.zettelId = generateZettelId();
-        this.header = header;
-        this.text = text;
+        this.header = "Type something";
+        this.text = "Type something";
         this.date = date;
         this.buzzword = buzzword;
     }
+
+
+
 
 
     public String getHeader() {
