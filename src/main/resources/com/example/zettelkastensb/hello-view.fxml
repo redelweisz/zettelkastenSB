@@ -15,7 +15,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.zettelkastensb.HelloController">
    <children>
       <SplitPane dividerPositions="0.2, 0.8" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color: #E6EEFF;">
-        <items>
+         <items>
             <AnchorPane prefHeight="798.0" prefWidth="256.0">
                <children>
                   <Label alignment="CENTER" layoutX="7.0" prefHeight="16.0" prefWidth="256.0" text="ZETTELKASTEN" textAlignment="JUSTIFY">
@@ -47,18 +47,18 @@
                   </HBox>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TextField fx:id="headerZettel" layoutY="-2.0" prefHeight="41.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" text="HEADER ZETTEL #1312">
+                  <TextField fx:id="headerZettel" layoutY="-2.0" onKeyTyped="#saveOnChangeZettel" prefHeight="41.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" text="HEADER ZETTEL #1312">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </TextField>
-                  <TextArea fx:id="textZettel" layoutY="39.0" prefHeight="762.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" wrapText="true" />
+                  <TextArea fx:id="textZettel" layoutY="39.0" onKeyTyped="#saveOnChangeZettel" prefHeight="762.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" wrapText="true" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="800.0" prefWidth="200.0" />
-        </items>
+         </items>
       </SplitPane>
    </children>
 </AnchorPane>

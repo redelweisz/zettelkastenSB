@@ -1,20 +1,19 @@
 package zettelkasten;
 
-import javafx.event.ActionEvent;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
+
+
+
+
 
 public class Datenbank {
+
     public static final String connectionString = "jdbc:sqlite:/home/sissi/zettel.db";
     // Methode um neuen Zettel zur DB zettel hinzuzufügen
 
@@ -41,6 +40,11 @@ public class Datenbank {
             e.printStackTrace();
         }
     }
+
+
+
+
+
 
 
 }

@@ -8,4 +8,5 @@ module com.example.zettelkastensb {
 
     opens com.example.zettelkastensb to javafx.fxml;
     exports com.example.zettelkastensb;
+    exports zettelkasten;
 }

@@ -2,11 +2,8 @@ package zettelkasten;
 
 
 import java.nio.ByteBuffer;
-import java.sql.Blob;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
 public class Zettel {
@@ -27,6 +24,7 @@ public class Zettel {
         this.date = date;
         this.buzzword = buzzword;
     }
+
 
 
 
@@ -73,7 +71,7 @@ public class Zettel {
     }
 
     // Id-Generator
-    private byte[] generateZettelId() {
+    public byte[] generateZettelId() {
         UUID uuid = UUID.randomUUID();
         ByteBuffer byteBuffer = ByteBuffer.allocate(16);
         byteBuffer.putLong(uuid.getMostSignificantBits());
