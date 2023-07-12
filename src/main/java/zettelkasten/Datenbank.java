@@ -42,9 +42,23 @@ public class Datenbank {
     }
 
 
+    public static void insertBuzzword(Buzzword b) {
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            String query = "INSERT INTO buzzword (BuzzwordId, Name) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
 
 
+            // SQL statement vorbereiten
+            statement.setBytes(1, b.getBuzzwordId());
+            statement.setString(2, b.getName());
 
+            // ausführen
+            statement.executeUpdate();
 
-
+            // schließen
+            statement.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 }
