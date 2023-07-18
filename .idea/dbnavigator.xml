@@ -20,9 +20,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" object-ref="schemas/zettel/tables/buzzword" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" dataset="zettel.buzzword" active-filter-id="EMPTY_FILTER">

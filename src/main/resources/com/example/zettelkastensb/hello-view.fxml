@@ -4,11 +4,15 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -22,33 +26,48 @@
          <items>
             <AnchorPane prefHeight="798.0" prefWidth="256.0">
                <children>
-                  <Label alignment="CENTER" layoutX="7.0" prefHeight="16.0" prefWidth="256.0" text="ZETTELKASTEN" textAlignment="JUSTIFY">
-                     <opaqueInsets>
-                        <Insets bottom="5.0" top="5.0" />
-                     </opaqueInsets>
-                  </Label>
-                  <TextField alignment="CENTER" layoutY="14.0" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
-                     <cursor>
-                        <Cursor fx:constant="TEXT" />
-                     </cursor>
-                     <effect>
-                        <InnerShadow />
-                     </effect>
-                  </TextField>
-                  <HBox layoutX="1.0" layoutY="774.0" prefHeight="24.0" prefWidth="256.0">
+                  <VBox layoutX="85.0" layoutY="305.0" prefHeight="798.0" prefWidth="263.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#newZettel" prefWidth="128.0" text="New Zettel">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Button>
-                        <Button alignment="CENTER" mnemonicParsing="false" prefWidth="128.0" text="Delete Zettel">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Button>
+                        <Label alignment="CENTER" prefHeight="24.0" prefWidth="256.0" text="ZETTELKASTEN" textAlignment="JUSTIFY">
+                           <opaqueInsets>
+                              <Insets bottom="5.0" top="5.0" />
+                           </opaqueInsets>
+                        </Label>
+                        <TextField alignment="CENTER" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor>
+                           <effect>
+                              <InnerShadow />
+                           </effect>
+                        </TextField>
+                        <Accordion>
+                          <panes>
+                            <TitledPane animated="false" text="Collections">
+                                 <content>
+                                    <ListView prefHeight="480.0" prefWidth="251.0" />
+                                 </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                        <Label text="Zettel" />
+                        <ListView fx:id="zettelList" prefHeight="732.0" prefWidth="253.0" />
+                        <HBox prefHeight="24.0" prefWidth="256.0">
+                           <children>
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#newZettel" prefWidth="128.0" text="New Zettel">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Button>
+                              <Button alignment="CENTER" mnemonicParsing="false" prefWidth="128.0" text="Delete Zettel">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
                </children>
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
@@ -58,7 +77,14 @@
                         <Font size="20.0" />
                      </font>
                   </TextField>
-                  <TextArea fx:id="textZettel" layoutY="39.0" onContextMenuRequested="#onContextMenuRequested" onKeyTyped="#saveOnChangeZettel" prefHeight="762.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" wrapText="true" />
+                  <TextArea fx:id="textZettel" layoutY="39.0" onContextMenuRequested="#onContextMenuRequested" onKeyTyped="#saveOnChangeZettel" prefHeight="762.0" prefWidth="755.0" style="-fx-background-color: #E6EEFF;" wrapText="true">
+                     <contextMenu>
+                        <ContextMenu onAction="#newBuzzword">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Create Buzzword" />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></TextArea>
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="800.0" prefWidth="200.0">
@@ -69,7 +95,6 @@
                         <Accordion />
                         <Label prefHeight="24.0" prefWidth="253.0" text="Buzzwords" />
                         <TextFlow prefHeight="24.0" prefWidth="248.0" />
-                        <Button mnemonicParsing="false" onAction="#newBuzzword" prefHeight="24.0" prefWidth="253.0" text="Create Buzzword" />
                      </children>
                   </VBox>
                </children></AnchorPane>

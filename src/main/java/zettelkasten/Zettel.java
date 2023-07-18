@@ -17,6 +17,9 @@ public class Zettel {
     private LocalDate date;
     public ArrayList<Buzzword> buzzword;
 
+    public Zettel() {
+    }
+
     public Zettel(LocalDate date, ArrayList<Buzzword> buzzword) {
         this.zettelId = generateZettelId();
         this.header = "Type something";
@@ -25,10 +28,13 @@ public class Zettel {
         this.buzzword = buzzword;
     }
 
-
-
-
-
+    public Zettel(byte[] zettelId, String header, String text, LocalDate date) {
+        this.zettelId = zettelId;
+        this.header = header;
+        this.text = text;
+        this.date = date;
+        buzzword = new ArrayList<>();
+    }
 
     public String getHeader() {
         return header;
