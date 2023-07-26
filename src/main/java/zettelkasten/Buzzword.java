@@ -14,6 +14,11 @@ public class Buzzword {
         this.name = name;
     }
 
+    public Buzzword(byte[] buzzwordId, String name) {
+        this.buzzwordId = buzzwordId;
+        this.name = name;
+    }
+
     public byte[] getBuzzwordId() {
         return buzzwordId;
     }
@@ -28,6 +33,11 @@ public class Buzzword {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     // Id-Generator

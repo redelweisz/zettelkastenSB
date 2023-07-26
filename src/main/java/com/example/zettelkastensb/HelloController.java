@@ -14,16 +14,13 @@ import zettelkasten.Buzzword;
 import zettelkasten.Datenbank;
 import zettelkasten.Zettel;
 import zettelkasten.ZettelUpdater;
-
-
-
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import static zettelkasten.Datenbank.connectionString;
-
+import static zettelkasten.Datenbank.*;
 
 
 public class HelloController {
@@ -45,7 +42,24 @@ public class HelloController {
     private ObservableList<Zettel> zettelData = FXCollections.observableArrayList();
 
 
+    @FXML
+    private ListView<Buzzword> buzzwordList;
 
+    @FXML
+    private ListView<Zettel> zettelBuzzwordList;
+    private ObservableList<Buzzword> bwData = FXCollections.observableArrayList();
+
+    private ObservableList<Zettel> zettelBwData = FXCollections.observableArrayList();
+
+    private ObservableList<Buzzword> bwDataFromZettel = FXCollections.observableArrayList();
+    private ObservableList<Buzzword> connectedBuzzwords = FXCollections.observableArrayList();
+
+    @FXML
+    private MenuButton mbShowBw;
+    @FXML
+    private RadioMenuItem btnShowAllBw;
+    @FXML
+    private RadioMenuItem btnShowZettelBw;
 
     public String getHeaderZettelText() {
         return headerZettel.getText();
@@ -110,6 +124,7 @@ public class HelloController {
             zettelData.setAll(Datenbank.getZettelData());
             zettelList.setItems(zettelData);
             initializeZettelList();
+            bwData.setAll(Datenbank.getBwData());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -129,7 +144,7 @@ public class HelloController {
                 zettelToUpdate.setHeader(header);
                 zettelToUpdate.setText(text);
 
-                // Update the Zettel in the database
+                // Zettel in der Datenbank Updaten
                 ZettelUpdater zettelUpdater = new ZettelUpdater();
                 zettelUpdater.updateZettel(header, text, currentZettelId);
             } else {
@@ -152,9 +167,9 @@ public class HelloController {
         // Zetteldaten aus Datenbank holen und zur Liste hinzufügen
         zettelList.setItems(zettelData);
 
-        //CellFactory einrichten um die Zeilen der ListView zu manipulieren.
+        //CellFactory einrichte, um die Zeilen der ListView zu manipulieren.
         zettelList.setCellFactory(param -> new ListCell<>() {
-            private final VBox vbRoot = new VBox(); // Use VBox to hold the text components (you can add other components as well)
+            private final VBox vbRoot = new VBox();
             private final Label lblHeader = new Label();
             private final Label lblText = new Label();
             private Zettel zettel;
@@ -162,15 +177,17 @@ public class HelloController {
             {
                 lblHeader.setStyle("-fx-font-weight: bold;");
                 vbRoot.setSpacing(10);
-                vbRoot.getChildren().addAll(lblHeader, lblText); // Add the labels to the VBox
+                vbRoot.getChildren().addAll(lblHeader, lblText);
             }
 
             @Override
             protected void updateItem(Zettel z, boolean empty) {
                 super.updateItem(z, empty);
+
                 if (z != null && !empty) {
+
                     lblHeader.setText(z.getHeader());
-                    lblText.setText(z.getText());
+                    lblText.setText(z.getText().split("\n")[0]);
                     setGraphic(vbRoot);
                     zettel = z; // Save the reference to the associated Zettel object
                 } else {
@@ -187,6 +204,8 @@ public class HelloController {
                     currentZettelId = newValue.getZettelId();
                     headerZettel.setText(newValue.getHeader());
                     textZettel.setText(newValue.getText());
+                    connectedBuzzwords = getBwFromZettel(currentZettelId);
+                    initializeBuzzwordFromZettelList();
                 } else {
                     currentZettelId = null;
                     headerZettel.clear();
@@ -197,7 +216,208 @@ public class HelloController {
 
     }
 
-}
+
+    public void initializeBuzzwordList() {
+                // Set the items of the ListView 'buzzwordList' using the fetched Buzzword objects
+                buzzwordList.setItems(bwData);
+        System.out.println("IBW called");
+
+        buzzwordList.setCellFactory(param -> new ListCell<>() {
+            private final VBox vbRoot = new VBox();
+            private final Label lblName = new Label();
+
+            private Buzzword buzzword;
+            {
+                vbRoot.setSpacing(10);
+                vbRoot.getChildren().addAll(lblName);
+            }
+
+            @Override
+            protected void updateItem(Buzzword b, boolean empty) {
+                super.updateItem(b, empty);
+
+                if (b != null && !empty) {
+
+                    lblName.setText(b.getName());
+                    setGraphic(vbRoot);
+                    buzzword = b; // Save the reference to the associated Zettel object
+                } else {
+                    setGraphic(null);
+                    buzzword = null; // Clear the reference when the cell is empty
+                }
+            }
+        });
+                // ChangeListener for 'buzzwordList' to handle loading connected Zettel objects
+        buzzwordList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                byte[] selectedBuzzwordId = newValue.getBuzzwordId();
+                List<Zettel> connectedZettels = Datenbank.loadConnectedZettels(selectedBuzzwordId);
+                zettelBuzzwordList.setItems(FXCollections.observableArrayList(connectedZettels));
+            } else {
+                zettelBuzzwordList.setItems(null); // Clear the 'zettelBuzzwordList'
+            }
+
+            // Pass the selected Buzzword's ID to the method to fetch associated Zettel objects
+            ObservableList<Zettel> zettelData = getZettelBwData(newValue.getBuzzwordId());
+            // Do something with the zettelData if needed.
+                });
+        initializeZettelBuzzwordList();
+            }
+
+    public void initializeBuzzwordFromZettelList() {
+        // Set the items of the ListView 'buzzwordList' using the fetched Buzzword objects
+        buzzwordList.setItems(connectedBuzzwords);
+        System.out.println("IBWFZL called");
+
+        buzzwordList.setCellFactory(param -> new ListCell<>() {
+            private final VBox vbRoot = new VBox();
+            private final Label lblName = new Label();
+
+            private Buzzword buzzword;
+            {
+                vbRoot.setSpacing(10);
+                vbRoot.getChildren().addAll(lblName);
+            }
+
+            @Override
+            protected void updateItem(Buzzword b, boolean empty) {
+                super.updateItem(b, empty);
+
+                if (b != null && !empty) {
+
+                    lblName.setText(b.getName());
+                    setGraphic(vbRoot);
+                    buzzword = b; // Save the reference to the associated Zettel object
+                } else {
+                    setGraphic(null);
+                    buzzword = null; // Clear the reference when the cell is empty
+                }
+            }
+        });
+        // ChangeListener for 'buzzwordList' to handle loading connected Zettel objects
+        buzzwordList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                byte[] selectedBuzzwordId = newValue.getBuzzwordId();
+                List<Zettel> connectedZettels = Datenbank.loadConnectedZettels(selectedBuzzwordId);
+                zettelBuzzwordList.setItems(FXCollections.observableArrayList(connectedZettels));
+            } else {
+                zettelBuzzwordList.setItems(null); // Clear the 'zettelBuzzwordList'
+            }
+
+            // Pass the selected Buzzword's ID to the method to fetch associated Zettel objects
+            ObservableList<Zettel> zettelData = getZettelBwData(newValue.getBuzzwordId());
+            // Do something with the zettelData if needed.
+        });
+        initializeZettelBuzzwordList();
+    }
+
+    public void initializeZettelBuzzwordList() {
+        // Set the items of the ListView 'buzzwordList' using the fetched Buzzword objects
+        zettelBuzzwordList.setItems(zettelBwData);
+        System.out.println("IZBW called");
+
+        zettelBuzzwordList.setCellFactory(param -> new ListCell<>() {
+            private final VBox vbRoot = new VBox();
+            private final Label lblHeader = new Label();
+            private final Label lblText = new Label();
+            private Zettel zettel;
+
+            {
+                lblHeader.setStyle("-fx-font-weight: bold;");
+                vbRoot.setSpacing(10);
+                vbRoot.getChildren().addAll(lblHeader, lblText);
+            }
+
+            @Override
+            protected void updateItem(Zettel z, boolean empty) {
+                super.updateItem(z, empty);
+
+                if (z != null && !empty) {
+
+                    lblHeader.setText(z.getHeader());
+                    lblText.setText(z.getText().split("\n")[0]);
+                    setGraphic(vbRoot);
+                    zettel = z; // Save the reference to the associated Zettel object
+                } else {
+                    setGraphic(null);
+                    zettel = null; // Clear the reference when the cell is empty
+                }
+            }
+        });
+        // ChangeListener für ListView um Zettel zu laden und handlen
+        zettelBuzzwordList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Zettel>() {
+            @Override
+            public void changed(ObservableValue<? extends Zettel> observable, Zettel oldValue, Zettel newValue) {
+                if (newValue != null) {
+                    currentZettelId = newValue.getZettelId();
+                    headerZettel.setText(newValue.getHeader());
+                    textZettel.setText(newValue.getText());
+                } else {
+                    currentZettelId = null;
+                    headerZettel.clear();
+                    textZettel.clear();
+                }
+            }
+        });
+    }
+    }
+
+
+
+
+
+    /*public void initializeZettelBwList() {
+        // Zetteldaten aus Datenbank holen und zur Liste hinzufügen
+        lvZettelBw.setItems(zettelBwData);
+
+        //CellFactory einrichten, um die Zeilen der ListView zu manipulieren.
+        zettelList.setCellFactory(param -> new ListCell<>() {
+            private final VBox vbRoot = new VBox();
+            private final Label lblHeader = new Label();
+            private final Label lblText = new Label();
+            private Zettel zettel;
+
+            {
+                lblHeader.setStyle("-fx-font-weight: bold;");
+                vbRoot.setSpacing(10);
+                vbRoot.getChildren().addAll(lblHeader, lblText);
+            }
+
+            @Override
+            protected void updateItem(Zettel z, boolean empty) {
+                super.updateItem(z, empty);
+
+                if (z != null && !empty) {
+
+                    lblHeader.setText(z.getHeader());
+                    lblText.setText(z.getText().split("\n")[0]);
+                    setGraphic(vbRoot);
+                    zettel = z; // Save the reference to the associated Zettel object
+                } else {
+                    setGraphic(null);
+                    zettel = null; // Clear the reference when the cell is empty
+                }
+            }
+        });
+        // ChangeListener für ListView um Zettel zu laden und handlen
+        lvZettelBw.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Zettel>() {
+            @Override
+            public void changed(ObservableValue<? extends Zettel> observable, Zettel oldValue, Zettel newValue) {
+                if (newValue != null) {
+                    currentZettelId = newValue.getZettelId();
+                    headerZettel.setText(newValue.getHeader());
+                    textZettel.setText(newValue.getText());
+                } else {
+                    currentZettelId = null;
+                    headerZettel.clear();
+                    textZettel.clear();
+                }
+            }
+        });
+
+    }
+
+*/
 
 
 
