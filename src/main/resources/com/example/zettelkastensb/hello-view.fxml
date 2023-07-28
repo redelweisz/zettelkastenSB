@@ -46,11 +46,25 @@
                           <panes>
                             <TitledPane animated="false" text="Collections">
                                  <content>
-                                    <ListView prefHeight="480.0" prefWidth="251.0" />
+                                    <ListView fx:id="collectionList" prefHeight="480.0" prefWidth="251.0" />
                                  </content>
                               </TitledPane>
                           </panes>
                         </Accordion>
+                        <HBox prefHeight="24.0" prefWidth="256.0">
+                           <children>
+                              <Button fx:id="btnNewCollection" alignment="CENTER" mnemonicParsing="false" onAction="#newZettel" prefWidth="128.0" text="New Collection">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnDeleteCollection" alignment="CENTER" mnemonicParsing="false" prefWidth="128.0" text="Delete Collection">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
                         <Label text="Zettel" />
                         <ListView fx:id="zettelList" prefHeight="732.0" prefWidth="253.0" />
                         <HBox prefHeight="24.0" prefWidth="256.0">
@@ -106,6 +120,8 @@
                         <ListView fx:id="buzzwordList" prefHeight="315.0" prefWidth="253.0" />
                         <Label prefHeight="24.0" prefWidth="255.0" text="Zettel containing Buzzword:" />
                         <ListView fx:id="zettelBuzzwordList" prefHeight="200.0" prefWidth="200.0" />
+                        <TextField fx:id="txtFieldCollectionName" promptText="Enter a Name for your Collection" />
+                        <Button fx:id="btnCreateCollectionFromSelected" mnemonicParsing="false" onAction="#handleCreateCollection" prefHeight="24.0" prefWidth="253.0" text="Group selected Zettel in Collection" />
                      </children>
                   </VBox>
                </children></AnchorPane>

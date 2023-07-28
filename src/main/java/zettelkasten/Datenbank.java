@@ -1,5 +1,4 @@
 package zettelkasten;
-
 import com.example.zettelkastensb.HelloController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,10 +16,6 @@ public class Datenbank {
     public static final String connectionString = "jdbc:sqlite:/home/sissi/zettel.db";
     static byte[] selectedBuzzwordId;
     // Methode um neuen Zettel zur DB zettel hinzuzufügen
-
-
-
-
     public static void insertZettel(Zettel z) throws SQLException {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
             String query = "INSERT INTO zettel (ZettelId, Header, Text, Date) VALUES (?, ?, ?, ?)";
@@ -43,21 +38,17 @@ public class Datenbank {
         }
     }
 
-
+//Methode um Buzzword zur Tabelle hinzuzufügen
     public static void insertBuzzword(Buzzword b) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
-
-
 
             //Query vorbereiten
             String query = "INSERT INTO buzzwords (BuzzwordId, Name) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
-
             // SQL statement vorbereiten
             statement.setBytes(1, b.getBuzzwordId());
             statement.setString(2, b.getName());
-
 
             // ausführen
             statement.executeUpdate();
@@ -103,6 +94,53 @@ public class Datenbank {
         }
     }
 
+    public static void insertCollection(Collection c) {
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+
+            //Query vorbereiten
+            String query = "INSERT INTO collections (CollectionId, Name) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            // SQL statement vorbereiten
+            statement.setBytes(1, c.getCollectionId());
+            statement.setString(2, c.getName());
+
+
+            // ausführen
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //
+    public static void insertIntoCollection(byte[] collectionId, ObservableList<Zettel> selectedZettel) {
+        String insertSQL = "INSERT INTO zettelCollections (ZettelCollectionId, CollectionId, ZettelId) VALUES (?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+
+            for (Zettel zettel : selectedZettel) {
+                //ZettelId für alle gewählten Zettel holen
+                byte[] zettelId = zettel.getZettelId();
+
+                //zettelId and collectionId in die zettelCollections Tabelle einfügen
+                pstmt.setBytes(1, generateZettelCollectionId());
+                pstmt.setBytes(2, collectionId);
+                pstmt.setBytes(3, zettelId);
+                pstmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+
+
+
+//Methode um Inhalt der Zettel zu holen und an ListViews zu übergeben
     public static ObservableList<Zettel> getZettelData(){
         ObservableList<Zettel> zettelData = FXCollections.observableArrayList();
 
@@ -132,9 +170,10 @@ public class Datenbank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return zettelData;
     }
+
+    //Methode um Buzzwords eines Zettels zu holen und an ListViews weiterzugeben
     public static ObservableList<Zettel> getZettelBwData(byte[] zettelId) {
         ObservableList<Zettel> zettelBwData = FXCollections.observableArrayList();
 
@@ -165,10 +204,9 @@ public class Datenbank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return zettelBwData;
     }
-
+//Methode um Buzzwords in der Tabelle auszulesen und an ListViews weiterzugeben
     public static ObservableList<Buzzword> getBwData() {
         ObservableList<Buzzword> bwData = FXCollections.observableArrayList();
 
@@ -186,41 +224,60 @@ public class Datenbank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("BWData returned");
         return bwData;
-
     }
 
-// Implement the method to fetch connected Zettel objects from the 'zettelBuzzwords' table
-
-    public static ObservableList<Zettel> loadConnectedZettels(byte[] buzzwordId) {
-        ObservableList<Zettel> connectedZettels =  FXCollections.observableArrayList();
-
-        // Connect to the SQLite database
+    //Methode um mit Zettel verbundene Buzzwords aus der Verbundtabelle zettelBuzzwords zu holen und an ListView zu übergeben
+    public static ObservableList<Buzzword> getBwFromZettel(byte[] zettelId) {
+        ObservableList<Buzzword> bwDataFromZettel = FXCollections.observableArrayList();
 
         try (Connection conn = DriverManager.getConnection(connectionString)) {
-
-            String fetchConnectedZettelsQuery = "SELECT * FROM zettelBuzzwords WHERE BuzzwordId = ?";
-            try (PreparedStatement fetchConnectedZettelsStmt = conn.prepareStatement(fetchConnectedZettelsQuery)) {
-                fetchConnectedZettelsStmt.setBytes(1, buzzwordId);
-                ResultSet resultSet = fetchConnectedZettelsStmt.executeQuery();
+            String fetchConnectedZettelQuery = "SELECT * FROM zettelBuzzwords WHERE ZettelId = ?";
+            try (PreparedStatement fetchConnectedZettelStmt = conn.prepareStatement(fetchConnectedZettelQuery)) {
+                fetchConnectedZettelStmt.setBytes(1, zettelId);
+                ResultSet resultSet = fetchConnectedZettelStmt.executeQuery();
 
                 while (resultSet.next()) {
-                    byte[] zettelId = resultSet.getBytes("ZettelId");
-                    // Fetch the Zettel object based on the zettelId and add it to the connectedZettels list
-                    Zettel zettel = fetchZettelById(zettelId);
-                    if (zettel != null) {
-                        connectedZettels.add(zettel);
+                    byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
+                    // Fetch the Buzzword object based on the buzzwordId and add it to the bwDataFromZettel list
+                    Buzzword buzzword = fetchBuzzwordById(buzzwordId);
+                    if (buzzword != null) {
+                        bwDataFromZettel.add(buzzword);
                     }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return connectedZettels;
+        return bwDataFromZettel;
     }
 
+//Methode um verbundene Zettel mithilfe der BuzzwordId aus der Komposittabelle zettelBuzzwords zu holen und an ListViews weiterzugeben
+    public static ObservableList<Zettel> loadConnectedZettel(byte[] buzzwordId) {
+        ObservableList<Zettel> connectedZettel =  FXCollections.observableArrayList();
+
+        try (Connection conn = DriverManager.getConnection(connectionString)) {
+
+            String fetchConnectedZettelQuery = "SELECT * FROM zettelBuzzwords WHERE BuzzwordId = ?";
+            try (PreparedStatement fetchConnectedZettelStmt = conn.prepareStatement(fetchConnectedZettelQuery)) {
+                fetchConnectedZettelStmt.setBytes(1, buzzwordId);
+                ResultSet resultSet = fetchConnectedZettelStmt.executeQuery();
+
+                while (resultSet.next()) {
+                    byte[] zettelId = resultSet.getBytes("ZettelId");
+                    // Zettel mithilfe von zettelId holen und zu connectedZettel hinzuzufügen
+                    Zettel zettel = fetchZettelById(zettelId);
+                    if (zettel != null) {
+                        connectedZettel.add(zettel);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connectedZettel;
+    }
+//Methode um Zettel aus der Tabelle auszulesen
     public static Zettel fetchZettelById(byte[] zettelId) {
         Zettel zettel = null;
 
@@ -248,34 +305,11 @@ public class Datenbank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return zettel;
     }
 
-    public static ObservableList<Buzzword> getBwFromZettel(byte[] zettelId) {
-        ObservableList<Buzzword> bwDataFromZettel = FXCollections.observableArrayList();
 
-        try (Connection conn = DriverManager.getConnection(connectionString)) {
-            String fetchConnectedZettelsQuery = "SELECT * FROM zettelBuzzwords WHERE ZettelId = ?";
-            try (PreparedStatement fetchConnectedZettelsStmt = conn.prepareStatement(fetchConnectedZettelsQuery)) {
-                fetchConnectedZettelsStmt.setBytes(1, zettelId);
-                ResultSet resultSet = fetchConnectedZettelsStmt.executeQuery();
-
-                while (resultSet.next()) {
-                    byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
-                    // Fetch the Buzzword object based on the buzzwordId and add it to the bwDataFromZettel list
-                    Buzzword buzzword = fetchBuzzwordById(buzzwordId);
-                    if (buzzword != null) {
-                        bwDataFromZettel.add(buzzword);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return bwDataFromZettel;
-    }
+    //Methode um Buzzword aus der Tabelle auszulesen
     public static Buzzword fetchBuzzwordById(byte[] buzzwordId) {
         try (Connection conn = DriverManager.getConnection(connectionString)) {
             String fetchBuzzwordQuery = "SELECT * FROM buzzwords WHERE BuzzwordId = ?";
@@ -292,22 +326,9 @@ public class Datenbank {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return null; // Return null if the Buzzword with the given ID is not found
     }
-    public void updateZettel(String header, String text, byte[] zettelId) {
-        try (Connection conn = DriverManager.getConnection(connectionString);
-             PreparedStatement stmt = conn.prepareStatement("UPDATE zettel SET Header = ?, Text = ? WHERE ZettelId = ?")) {
-            stmt.setString(1, header);
-            stmt.setString(2, text);
-            stmt.setBytes(3, zettelId);
-            stmt.executeUpdate();
-            System.out.println("Zettel updated successfully.");
-        } catch (SQLException e) {
-            System.out.println("Error updating zettel: " + e.getMessage());
-        }
-    }
-
+    //Methode um zettelBuzzwordId zu generieren
     public static byte[] generateZettelBuzzwordId() {
         UUID uuid = UUID.randomUUID();
         ByteBuffer byteBuffer = ByteBuffer.allocate(16);
@@ -316,6 +337,16 @@ public class Datenbank {
         return byteBuffer.array();
     }
 
+    public static byte[] generateZettelCollectionId() {
+        UUID uuid = UUID.randomUUID();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(16);
+        byteBuffer.putLong(uuid.getMostSignificantBits());
+        byteBuffer.putLong(uuid.getLeastSignificantBits());
+        return byteBuffer.array();
+    }
+
+
+}
 
     /*public static Zettel readZettel(byte[] zettelId){
         try (Connection connection = DriverManager.getConnection(connectionString)) {
@@ -338,4 +369,4 @@ public class Datenbank {
     }
 
 */
-}
+

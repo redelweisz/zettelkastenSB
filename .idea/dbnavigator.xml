@@ -21,8 +21,8 @@
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
-      <object connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" object-ref="schemas/zettel/tables/zettelBuzzwords" />
-      <object connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" object-ref="schemas/zettel/tables/buzzwords" />
+      <object connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" object-ref="schemas/zettel/tables/collections" />
+      <object connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" object-ref="schemas/zettel/tables/zettelCollections" />
     </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
@@ -32,6 +32,8 @@
         <condition column="BuzzwordId" operator="=" value="" active="true" />
       </filter>
     </filter-actions>
+    <filter-actions connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" dataset="zettel.zettelCollections" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" dataset="zettel.collections" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" dataset="zettel.zettelBuzzwords" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="ccbe1f7f-b2b9-4a1d-b9b9-df47d08c2227" dataset="zettel.zettel" active-filter-id="EMPTY_FILTER">
       <filter id="e4e7cbf6-3604-4127-97a5-15e89db70607" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
