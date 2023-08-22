@@ -8,6 +8,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -35,6 +38,31 @@ public class Datenbank {
             statement.close();
         }catch (SQLException e){
             e.printStackTrace();
+        }
+    }
+// Methode um ausgewählten Zettel zu aus der DB zettel zu löschen
+    public static void deleteZettel(byte[] zettelId) throws SQLException {
+
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+
+            String deleteCollectionsSql = "DELETE FROM zettelCollections WHERE ZettelId = ?";
+            String deleteBuzzwordsSql = "DELETE FROM zettelBuzzwords WHERE ZettelId = ?";
+            String sql = "DELETE FROM zettel WHERE ZettelId = ?";
+            try (PreparedStatement statement = connection.prepareStatement(deleteCollectionsSql)) {
+                statement.setBytes(1, zettelId);
+                statement.executeUpdate();
+                System.out.println("Zettel with the ID " + zettelId.toString() + "deleted from Database zettelCollections");
+            }
+            try (PreparedStatement deleteBuzzwordsStatement = connection.prepareStatement(deleteBuzzwordsSql)) {
+                deleteBuzzwordsStatement.setBytes(1, zettelId);
+                deleteBuzzwordsStatement.executeUpdate();
+                System.out.println("Connected buzzwords for Zettel with ID " + zettelId.toString() + " deleted from Database zettelBuzzwords");
+            }
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setBytes(1, zettelId);
+                statement.executeUpdate();
+                System.out.println("Zettel with the ID " + zettelId.toString() + "deleted from Database");
+            }
         }
     }
 
@@ -94,6 +122,51 @@ public class Datenbank {
         }
     }
 
+    public static void checkForBuzzwords(Buzzword b, byte[] currentZettelId) {
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            // In headers und text nach buzzword suchen
+            String searchText = "%" + b.getName() + "%";
+            String searchQuery = "SELECT DISTINCT ZettelId FROM zettel WHERE (Header LIKE ? OR Text LIKE ?) AND ZettelId = ?";
+            PreparedStatement searchStatement = connection.prepareStatement(searchQuery);
+            searchStatement.setString(1, searchText);
+            searchStatement.setString(2, searchText);
+            searchStatement.setBytes(3, currentZettelId);
+            ResultSet resultSet = searchStatement.executeQuery();
+
+            // Query, um zu überprüfen, ob das Mapping bereits in zettelBuzzwords existiert
+            String checkMappingQuery = "SELECT COUNT(*) AS count FROM zettelBuzzwords WHERE ZettelId = ? AND BuzzwordId = ?";
+            PreparedStatement checkMappingStatement = connection.prepareStatement(checkMappingQuery);
+            checkMappingStatement.setBytes(1, currentZettelId);
+            checkMappingStatement.setBytes(2, b.getBuzzwordId());
+
+            // Einfügen, wenn nicht
+            String zettelBuzzwordInsertQuery = "INSERT INTO zettelBuzzwords (ZettelBuzzwordId, ZettelId, BuzzwordId) VALUES (?, ?, ?)";
+            PreparedStatement zettelBuzzwordStatement = connection.prepareStatement(zettelBuzzwordInsertQuery);
+            zettelBuzzwordStatement.setBytes(2, currentZettelId);
+            zettelBuzzwordStatement.setBytes(3, b.getBuzzwordId());
+
+            while (resultSet.next()) {
+                byte[] zettelId = resultSet.getBytes("ZettelId");
+                checkMappingStatement.setBytes(1, zettelId);
+                ResultSet checkResult = checkMappingStatement.executeQuery();
+                checkResult.next();
+                int count = checkResult.getInt("count");
+
+                if (count == 0) {
+                    zettelBuzzwordStatement.setBytes(1, generateZettelBuzzwordId());
+                    zettelBuzzwordStatement.executeUpdate();
+                }
+            }
+            System.out.println("made entry in zettelBuzzwords");
+
+            zettelBuzzwordStatement.close();
+            checkMappingStatement.close();
+            searchStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void insertCollection(Collection c) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
 
@@ -114,7 +187,28 @@ public class Datenbank {
         }
     }
 
-    //
+
+    public static void deleteCollection(byte[] collectionId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            String deleteZettelCollectionSQL = "DELETE FROM zettelCollections WHERE CollectionId = ?";
+            String deleteCollectionSQL = "DELETE FROM collections WHERE CollectionId = ?";
+            try (PreparedStatement deleteZettelCollectionStatement = connection.prepareStatement(deleteZettelCollectionSQL)) {
+
+                // Zuerst verbundene Einträge in zettelCollections löschen
+                deleteZettelCollectionStatement.setBytes(1, collectionId);
+                deleteZettelCollectionStatement.executeUpdate();
+
+               // Die collection löschen
+                try (PreparedStatement deleteCollectionStatement = connection.prepareStatement(deleteCollectionSQL)) {
+                    deleteCollectionStatement.setBytes(1, collectionId);
+                    deleteCollectionStatement.executeUpdate();
+                    System.out.println("Collection and related zettelCollections entries deleted");
+                }
+            }
+        }
+    }
+
+    //Methode um ausgewählten Zettel der Collection hinzuzufügen
     public static void insertIntoCollection(byte[] collectionId, ObservableList<Zettel> selectedZettel) {
         String insertSQL = "INSERT INTO zettelCollections (ZettelCollectionId, CollectionId, ZettelId) VALUES (?, ?, ?)";
 
@@ -137,7 +231,24 @@ public class Datenbank {
         }
     }
 
+    // Methode um Collections aus DB collections zu lesen und an ListView zu übergeben
+    public static ObservableList<Collection> getCollections() throws SQLException {
+        ObservableList<Collection> collections = FXCollections.observableArrayList();
 
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            String sql = "SELECT collectionId, Name FROM collections";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    byte[] collectionId = resultSet.getBytes("collectionId");
+                    String name = resultSet.getString("Name");
+                    collections.add(new Collection(collectionId, name));
+                }
+            }
+        }
+
+        return collections;
+    }
 
 
 //Methode um Inhalt der Zettel zu holen und an ListViews zu übergeben
@@ -174,8 +285,8 @@ public class Datenbank {
     }
 
     //Methode um Buzzwords eines Zettels zu holen und an ListViews weiterzugeben
-    public static ObservableList<Zettel> getZettelBwData(byte[] zettelId) {
-        ObservableList<Zettel> zettelBwData = FXCollections.observableArrayList();
+    public static ObservableList<Zettel> getCurrentZettelData(byte[] zettelId) {
+        ObservableList<Zettel> currentZettelData = FXCollections.observableArrayList();
 
         try (Connection conn = DriverManager.getConnection(connectionString);
              PreparedStatement stmt = conn.prepareStatement("SELECT ZettelId, Header, Text, Date FROM zettel WHERE ZettelId = ?")) {
@@ -199,12 +310,12 @@ public class Datenbank {
                 zettel.setText(text);
                 zettel.setDate(date);
 
-                zettelBwData.add(zettel);
+                currentZettelData.add(zettel);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return zettelBwData;
+        return currentZettelData;
     }
 //Methode um Buzzwords in der Tabelle auszulesen und an ListViews weiterzugeben
     public static ObservableList<Buzzword> getBwData() {
@@ -239,7 +350,7 @@ public class Datenbank {
 
                 while (resultSet.next()) {
                     byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
-                    // Fetch the Buzzword object based on the buzzwordId and add it to the bwDataFromZettel list
+                    // Buzzword mit ID holen und zur Liste hinzufügen
                     Buzzword buzzword = fetchBuzzwordById(buzzwordId);
                     if (buzzword != null) {
                         bwDataFromZettel.add(buzzword);
@@ -250,6 +361,50 @@ public class Datenbank {
             e.printStackTrace();
         }
         return bwDataFromZettel;
+    }
+
+    public static void updateBuzzwordsForZettel(byte[] currentZettelId, ObservableList<Buzzword> bwDataFromZettel) {
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            // Liste mit buzzwordIds dieses Zettels holen
+            List<byte[]> currentBuzzwordIds = new ArrayList<>();
+            String getBuzzwordIdsQuery = "SELECT BuzzwordId FROM zettelBuzzwords WHERE ZettelId = ?";
+            try (PreparedStatement getBuzzwordIdsStatement = connection.prepareStatement(getBuzzwordIdsQuery)) {
+                getBuzzwordIdsStatement.setBytes(1, currentZettelId);
+                ResultSet resultSet = getBuzzwordIdsStatement.executeQuery();
+
+                while (resultSet.next()) {
+                    byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
+                    currentBuzzwordIds.add(buzzwordId);
+                }
+            }
+
+            // Fehlen buzzwords im Text?
+            List<byte[]> buzzwordsToRemove = new ArrayList<>();
+            for (byte[] buzzwordId : currentBuzzwordIds) {
+                boolean found = false;
+                for (Buzzword buzzword : bwDataFromZettel) {
+                    if (Arrays.equals(buzzword.getBuzzwordId(), buzzwordId)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    buzzwordsToRemove.add(buzzwordId);
+                }
+            }
+
+            // Mappings von buzzwords die nicht mehr im Text existieren löschen
+            String deleteMappingQuery = "DELETE FROM zettelBuzzwords WHERE ZettelId = ? AND BuzzwordId = ?";
+            try (PreparedStatement deleteMappingStatement = connection.prepareStatement(deleteMappingQuery)) {
+                deleteMappingStatement.setBytes(1, currentZettelId);
+                for (byte[] buzzwordId : buzzwordsToRemove) {
+                    deleteMappingStatement.setBytes(2, buzzwordId);
+                    deleteMappingStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 //Methode um verbundene Zettel mithilfe der BuzzwordId aus der Komposittabelle zettelBuzzwords zu holen und an ListViews weiterzugeben

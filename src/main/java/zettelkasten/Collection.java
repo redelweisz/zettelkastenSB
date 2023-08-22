@@ -1,17 +1,30 @@
 package zettelkasten;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Collection {
     private byte[] collectionId;
 
     private String name;
+    private List<Zettel> zettelCollection;
+
+    public List<Zettel> getZettelCollection() {
+        return zettelCollection;
+    }
+
+    public void setZettelCollection(List<Zettel> zettelCollection) {
+        this.zettelCollection = zettelCollection;
+    }
 
     public Collection(byte[] collectionId, String name) {
-        this.collectionId = generateCollectionId();
+        this.collectionId = collectionId;
         this.name = name;
+        this.zettelCollection = new ArrayList<>();
     }
+
 
     public byte[] getCollectionId() {
         return collectionId;
@@ -37,9 +50,16 @@ public class Collection {
 
     }
 
-    public void addZettel(){
+    public void addZettel(Zettel zettel) {
 
+        zettelCollection.add(zettel);
     }
+
+    public void addAll(List<Zettel> zettelsToAdd) {
+        zettelCollection.addAll(zettelsToAdd);
+    }
+
+
 
 
 

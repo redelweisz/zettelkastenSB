@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import zettelkasten.*;
 
 import java.sql.*;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static zettelkasten.Datenbank.*;
 
@@ -29,8 +31,8 @@ public class HelloController {
     private String selected = "";
    public String collectionName = "";
     private ObservableList<Buzzword> bwData = FXCollections.observableArrayList();
-    private ObservableList<Zettel> zettelBwData = FXCollections.observableArrayList();
-    private ObservableList<Buzzword> bwDataFromZettel = FXCollections.observableArrayList();
+    private ObservableList<Zettel> currentZettelData = FXCollections.observableArrayList();
+    public ObservableList<Buzzword> bwDataFromZettel = FXCollections.observableArrayList();
     private ObservableList<Buzzword> connectedBuzzwords = FXCollections.observableArrayList();
     private ObservableList<Zettel> zettelData = FXCollections.observableArrayList();
     private ObservableList<Zettel> selectedZettel = FXCollections.observableArrayList();
@@ -42,6 +44,7 @@ public class HelloController {
     private TextField txtFieldCollectionName;
     @FXML
     private ListView<Zettel> zettelList;
+    private ListView<Zettel> zettelListView;
     @FXML
     private ListView<Buzzword> buzzwordList;
     @FXML
@@ -56,6 +59,8 @@ public class HelloController {
     private RadioMenuItem btnShowZettelBw;
     @FXML
     private Button btnCreateCollectionFromSelected;
+    @FXML
+    private Button btnDeleteZettel;
 
     public String getHeaderZettelText() {
 
@@ -77,26 +82,158 @@ public class HelloController {
             currentZettelId = z.getZettelId(); // Speichere die aktuelle ZettelId in der Variable
             zettelData.add(z); // Add the new Zettel to the zettelData list
             zettelList.getSelectionModel().select(z); // Select the newly added Zettel in the ListView
-            initialize();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+    // Methode um ausgewählten Zettel aus der DB zettel zu löschen
+    @FXML
+    void deleteZettel(ActionEvent event) {
+        Zettel selectedZettel = zettelList.getSelectionModel().getSelectedItem();
+        //Zeige eine Warnung, falls kein zu löschender Zettel in zettelList ausgewählt wurde
+        if (selectedZettel == null) {
+            showAlert(Alert.AlertType.WARNING, "No Selection", "First select a Zettel in the list above please.");
+            return;
+        }
+
+        // Zeige einen Bestätigungsdialog vor dem Löschen
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Deletion");
+        alert.setHeaderText("Delete Zettel");
+        alert.setContentText("Are you sure you want to delete the selected Zettel?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                Datenbank.deleteZettel(selectedZettel.getZettelId());
+
+                initialize();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    public void initializeZettelListView() {
+        zettelListView = new ListView<>(Datenbank.getZettelData());
+        zettelListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        zettelListView.setCellFactory(param -> new ListCell<>() {
+            private final VBox vbRoot = new VBox();
+            private final Label lblHeader = new Label();
+            private final Label lblText = new Label();
+            private Zettel zettel;
+
+            {
+                lblHeader.setStyle("-fx-font-weight: bold;");
+                vbRoot.setSpacing(10);
+                vbRoot.getChildren().addAll(lblHeader, lblText);
+            }
+
+            @Override
+            protected void updateItem(Zettel z, boolean empty) {
+                super.updateItem(z, empty);
+
+                if (z != null && !empty) {
+                    lblHeader.setText(z.getHeader());
+                    lblText.setText(z.getText().split("\n")[0]);
+                    setGraphic(vbRoot);
+                    zettel = z; //  Referenz zum verbundenen Zettelobjekt löschen
+                } else {
+                    setGraphic(null);
+                    zettel = null; // Referenz verlieren, wenn Zelle leer ist
+                }
+            }
+        });
+    }
 //Methode um neues Buzzword anzulegen
     @FXML
    void newBuzzword(ActionEvent event) {
-        Buzzword b = new Buzzword(selected);
-        Datenbank.insertBuzzword(b);
-        System.out.println("New Buzzword generated");
-        currentBuzzwordId = b.getBuzzwordId(); // Speichere die aktuelle BuzzwordId in der Variable
+        // Prüfen ob BW bereits existiert
+        String selectedBuzzword = selected;
+
+        // Check if the buzzword already exists in bwData
+        boolean buzzwordExists = bwData.stream()
+                .anyMatch(buzzword -> buzzword.getName().equalsIgnoreCase(selectedBuzzword));
+
+
+        if (buzzwordExists) {
+            // Alert anzeigen, falls BW bereits existiert
+            showAlert(Alert.AlertType.WARNING, "Duplicate Buzzword", "A buzzword with the name '" + selectedBuzzword + "' already exists.");
+        } else {
+            Buzzword b = new Buzzword(selected);
+            Datenbank.insertBuzzword(b);
+            System.out.println("New Buzzword generated");
+            currentBuzzwordId = b.getBuzzwordId(); // Speichere die aktuelle BuzzwordId in der Variable
+        }
     }
 
     @FXML
     void newCollection(ActionEvent event) {
-        Collection c = new Collection(null, collectionName);
-        Datenbank.insertCollection(c);
-        System.out.println("New Collection generated");
-        currentCollectionId = c.getCollectionId(); // Speichere die aktuelle CollectionId in der Variable
+        initializeZettelListView();
+        Dialog<Collection> dialog = new Dialog<>();
+        dialog.setTitle("Create New Collection");
+
+        ButtonType createButtonType = new ButtonType("Create Collection", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
+
+        TextField collectionNameField = new TextField();
+        collectionNameField.setPromptText("Enter Collection Name");
+
+        VBox content = new VBox(10);
+        content.getChildren().addAll(zettelListView, collectionNameField);
+        dialog.getDialogPane().setContent(content);
+
+        dialog.setResultConverter(new Callback<ButtonType, Collection>() {
+            @Override
+            public Collection call(ButtonType buttonType) {
+                if (buttonType == createButtonType) {
+                    String name = collectionNameField.getText();
+
+                    byte[] collectionId = Collection.generateCollectionId();
+
+                    Collection c = new Collection(collectionId, name);
+                    Datenbank.insertCollection(c);
+                    Datenbank.insertIntoCollection(collectionId, zettelListView.getSelectionModel().getSelectedItems());
+                    showAlert(Alert.AlertType.INFORMATION, "Collection Created", "Collection '" + name + "' has been created.");
+
+                    ObservableList<Zettel> selectedZettels = zettelListView.getSelectionModel().getSelectedItems();
+                    c.getZettelCollection().addAll(selectedZettels);
+
+                    return c;
+                }
+                return null;
+            }
+        });
+
+        dialog.showAndWait();
+        initializeCollectionList();
+    }
+
+    @FXML
+    void deleteCollection(ActionEvent event) {
+        Collection selectedCollection = collectionList.getSelectionModel().getSelectedItem();
+
+        if (selectedCollection == null) {
+            // Zeige eine Warnung, falls keine zu löschende Collection in collectionList ausgewählt ist
+            showAlert(Alert.AlertType.WARNING, "No Selection", "First select a Collection in the list above, please.");
+            return;
+        }
+
+        // Zeige einen Bestätigungsdialog vor dem Löschen
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Deletion");
+        alert.setHeaderText("Delete Collection");
+        alert.setContentText("Are you sure you want to delete the selected Collection?" + selectedCollection.getName());
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                Datenbank.deleteCollection(selectedCollection.getCollectionId());
+                initialize();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @FXML
@@ -113,11 +250,12 @@ public class HelloController {
             } else {
                 byte[] collectionId = Collection.generateCollectionId();
 
-                Collection c = new Collection(null, collectionName);
+                Collection c = new Collection(collectionId, collectionName);
                 Datenbank.insertCollection(c);
                 Datenbank.insertIntoCollection(collectionId, selectedZettel);
                 showAlert(Alert.AlertType.INFORMATION, "Collection Created", "Collection '" + name + "' has been created.");
             }
+            initializeCollectionList();
         } else {
             showAlert(Alert.AlertType.WARNING, "Empty Collection Name", "Please enter a collection name.");
         }
@@ -125,7 +263,7 @@ public class HelloController {
 
 
 
-    //Methode um Alarm anzuzeigen
+    //Methode um Alert anzuzeigen
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -153,6 +291,7 @@ public class HelloController {
             zettelList.setItems(zettelData);
             initializeZettelList();
             bwData.setAll(Datenbank.getBwData());
+            initializeCollectionList();
     }
     //ListView mit Zetteln befüllen
     public void initializeZettelList() {
@@ -180,13 +319,14 @@ public class HelloController {
                     lblHeader.setText(z.getHeader());
                     lblText.setText(z.getText().split("\n")[0]);
                     setGraphic(vbRoot);
-                    zettel = z; // Save the reference to the associated Zettel object
+                    zettel = z; // Referenz zum verbundenen Zettelobjekt löschen
                 } else {
                     setGraphic(null);
-                    zettel = null; // Clear the reference when the cell is empty
+                    zettel = null; // Referenz verlieren, wenn Zelle leer ist
                 }
             }
         });
+
         // ChangeListener für ListView um Zettel zu laden und handlen
         zettelList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Zettel>() {
             @Override
@@ -227,7 +367,6 @@ public class HelloController {
             } else {
                 System.out.println("Keine aktuelle ZettelId vorhanden.");
             }
-
         }
     }
     //Zetteländerungen beim Tippen speichern
@@ -235,6 +374,15 @@ public class HelloController {
     void saveOnChangeZettel(KeyEvent event){
         if (currentZettelId != null) { // Überprüfe, ob eine aktuelle ZettelId vorhanden ist
             updateZettelInDatabase();
+            checkForBuzzwordsInCurrentZettel(currentZettelId);
+            initializeBuzzwordList();
+            updateBuzzwordsForZettel(currentZettelId, bwDataFromZettel);
+        }
+    }
+
+    public void checkForBuzzwordsInCurrentZettel(byte[] currentZettelId) {
+        for (Buzzword buzzword : bwData) {
+            checkForBuzzwords(buzzword, currentZettelId);
         }
     }
 
@@ -276,9 +424,6 @@ public class HelloController {
             } else {
                 zettelBuzzwordList.setItems(null); // Clear the 'zettelBuzzwordList'
             }
-
-            // BuzzwordID weiterreichen und die verbundenen Zettel zu holen
-            ObservableList<Zettel> zettelData = getZettelBwData(newValue.getBuzzwordId());
                 });
         initializeZettelBuzzwordList();
             }
@@ -286,7 +431,7 @@ public class HelloController {
             //ListView zettelBuzzwordList mit Zetteln zu einem Buzzword befüllen
     public void initializeZettelBuzzwordList() {
         // Items für ListView zettelBuzzwordList setzen
-        zettelBuzzwordList.setItems(zettelBwData);
+        zettelBuzzwordList.setItems(currentZettelData);
         System.out.println("initializeZettelBuzzwordList() called");
         zettelBuzzwordList.setCellFactory(param -> new ListCell<>() {
             private final VBox vbRoot = new VBox();
@@ -309,10 +454,10 @@ public class HelloController {
                     lblHeader.setText(z.getHeader());
                     lblText.setText(z.getText().split("\n")[0]);
                     setGraphic(vbRoot);
-                    zettel = z; // Save the reference to the associated Zettel object
+                    zettel = z; // Referenz zum Zettelobjekt speichern
                 } else {
                     setGraphic(null);
-                    zettel = null; // Clear the reference when the cell is empty
+                    zettel = null; // Referenz verlieren, wenn Zelle leer ist
                 }
             }
         });
@@ -370,10 +515,10 @@ public class HelloController {
 
                     lblName.setText(b.getName());
                     setGraphic(vbRoot);
-                    buzzword = b; // Save the reference to the associated Zettel object
+                    buzzword = b; // Referenz zum verbundenen Zettelobjekt löschen
                 } else {
                     setGraphic(null);
-                    buzzword = null; // Clear the reference when the cell is empty
+                    buzzword = null; // Referenz löschen, wenn Zelle leer ist
                 }
             }
         });
@@ -383,15 +528,36 @@ public class HelloController {
                 byte[] selectedBuzzwordId = newValue.getBuzzwordId();
                 List<Zettel> connectedZettel = Datenbank.loadConnectedZettel(selectedBuzzwordId);
                 zettelBuzzwordList.setItems(FXCollections.observableArrayList(connectedZettel));
+                //BuzzwordID weitergeben, um verbundene Zettel zu holen
+                ObservableList<Zettel> zettelData = getCurrentZettelData(newValue.getBuzzwordId());
             } else {
                 zettelBuzzwordList.setItems(null); //zettelBuzzwordList löschen
             }
-
-            //BuzzwordID weitergeben, um verbundene Zettel zu holen
-            ObservableList<Zettel> zettelData = getZettelBwData(newValue.getBuzzwordId());
-
         });
         initializeZettelBuzzwordList();
+    }
+
+    // Methode um ListView collectionList zu befüllen
+    void initializeCollectionList() {
+        try {
+            ObservableList<Collection> collectionData = Datenbank.getCollections();
+            collectionList.setItems(collectionData);
+
+            collectionList.setCellFactory(param -> new ListCell<Collection>() {
+                @Override
+                protected void updateItem(Collection item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null || item.getName() == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     }

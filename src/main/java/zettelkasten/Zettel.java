@@ -85,6 +85,14 @@ public class Zettel {
         return byteBuffer.array();
     }
 
+    @Override
+    public String toString() {
+        return "Zettel{" +
+                "header='" + header + '\'' +
+                ", text='" + text + '\'' +
+                '}';
+    }
+
     // toString methode ID
     private static String bytesToHexString(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
