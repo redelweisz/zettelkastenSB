@@ -355,7 +355,6 @@ public class HelloController {
                         headerZettel.setText(newValue.getHeader());
                         textZettel.setText(newValue.getText());
                         connectedBuzzwords = getBwFromZettel(currentZettelId);
-                        initializeBuzzwordFromZettelList();
                     } else {
                         currentZettelId = null;
                         headerZettel.clear();
@@ -466,7 +465,6 @@ public class HelloController {
                     headerZettel.setText(newValue.getHeader());
                     textZettel.setText(newValue.getText());
                     connectedBuzzwords = getBwFromZettel(currentZettelId);
-                    initializeBuzzwordFromZettelList();
                 } else {
                     currentZettelId = null;
                     headerZettel.clear();
@@ -484,6 +482,8 @@ public class HelloController {
         datePicker.setValue(null);
         // Zetteldaten aus Datenbank holen und zur Liste hinzufügen
         zettelList.setItems(zettelData);
+        //Searchbar zurücksetzen
+        txtSearchBar.clear();
 
         //CellFactory einrichten, um die Zeilen der ListView zu manipulieren.
         zettelList.setCellFactory(param -> new ListCell<>() {
@@ -562,8 +562,6 @@ public class HelloController {
         if (currentZettelId != null) { // Überprüfe, ob eine aktuelle ZettelId vorhanden ist
             updateZettelInDatabase();
             checkForBuzzwordsInCurrentZettel(currentZettelId);
-            initializeBuzzwordList();
-            updateBuzzwordsForZettel(currentZettelId, bwDataFromZettel);
         }
     }
 
@@ -721,7 +719,6 @@ public class HelloController {
                 zettelBuzzwordList.setItems(null); //zettelBuzzwordList löschen
             }
         });
-        initializeZettelBuzzwordList();
     }
 
     // Methode um ListView collectionList zu befüllen

@@ -77,7 +77,7 @@ public class Datenbank {
 
             // SQL statement vorbereiten
             statement.setBytes(1, b.getBuzzwordId());
-            statement.setString(2, b.getName());
+            statement.setString(2, b.getName().toLowerCase());
 
             // ausführen
             statement.executeUpdate();
@@ -164,10 +164,11 @@ public class Datenbank {
     }
     // Methode um zu überprüfen, ob bekannte buzzwords im Text vorkommen
     public static void checkForBuzzwords(Buzzword b, byte[] currentZettelId) {
+        System.out.println("checkForBuzzwords() called");
         try (Connection connection = DriverManager.getConnection(connectionString)) {
-            // In headers und text nach buzzword suchen
-            String searchText = "%" + b.getName() + "%";
-            String searchQuery = "SELECT DISTINCT ZettelId FROM zettel WHERE (Header LIKE ? OR Text LIKE ?) AND ZettelId = ?";
+            // In headers und text nach buzzword suchen (in lowercase)
+            String searchText = "%" + b.getName().toLowerCase() + "%";
+            String searchQuery = "SELECT DISTINCT ZettelId FROM zettel WHERE (LOWER(Header) LIKE ? OR LOWER(Text) LIKE ?) AND ZettelId = ?";
             PreparedStatement searchStatement = connection.prepareStatement(searchQuery);
             searchStatement.setString(1, searchText);
             searchStatement.setString(2, searchText);
@@ -196,9 +197,11 @@ public class Datenbank {
                 if (count == 0) {
                     zettelBuzzwordStatement.setBytes(1, generateZettelBuzzwordId());
                     zettelBuzzwordStatement.executeUpdate();
+                    System.out.println("made entry in zettelBuzzwords");
                 }
             }
-            System.out.println("made entry in zettelBuzzwords");
+            // Prüfen, ob noch alle Buzzwords enthalten sind, wenn nicht, löschen
+            checkForMissingBuzzwords(currentZettelId);
 
             zettelBuzzwordStatement.close();
             checkMappingStatement.close();
@@ -207,6 +210,66 @@ public class Datenbank {
             e.printStackTrace();
         }
     }
+    // Methode um zu überprüfen, ob nach Änderung noch alle buzzwords im Zettel enthalten sind
+    public static void checkForMissingBuzzwords(byte[] currentZettelId) {
+        System.out.println("checkForMissingBuzzwords() called");
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            // List der Buzzwords im ausgewählten Zettel holen
+            List<byte[]> currentBuzzwordIds = new ArrayList<>();
+            String getBuzzwordIdsQuery = "SELECT BuzzwordId FROM zettelBuzzwords WHERE ZettelId = ?";
+            try (PreparedStatement getBuzzwordIdsStatement = connection.prepareStatement(getBuzzwordIdsQuery)) {
+                getBuzzwordIdsStatement.setBytes(1, currentZettelId);
+                ResultSet resultSet = getBuzzwordIdsStatement.executeQuery();
+
+                while (resultSet.next()) {
+                    byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
+                    currentBuzzwordIds.add(buzzwordId);
+                }
+            }
+
+            // Aktuellen Text und Header abrufen
+            ObservableList<Zettel> zettelData = getCurrentZettelData(currentZettelId);
+            String currentText = zettelData.get(0).getText();
+            String currentHeader = zettelData.get(0).getHeader();
+
+            // Prüfen, ob es für den Zettel und Buzzword Mappings gibt
+            String checkMappingQuery = "SELECT COUNT(*) AS count FROM zettelBuzzwords WHERE ZettelId = ? AND BuzzwordId = ?";
+            PreparedStatement checkMappingStatement = connection.prepareStatement(checkMappingQuery);
+            checkMappingStatement.setBytes(1, currentZettelId);
+
+            // Mapping löschen, falls das Buzzword weder in Text noch Header auftaucht
+            String deleteMappingQuery = "DELETE FROM zettelBuzzwords WHERE ZettelId = ? AND BuzzwordId = ?";
+            try (PreparedStatement deleteMappingStatement = connection.prepareStatement(deleteMappingQuery)) {
+                deleteMappingStatement.setBytes(1, currentZettelId);
+
+                for (byte[] buzzwordId : currentBuzzwordIds) {
+                    Buzzword buzzword = fetchBuzzwordById(buzzwordId);
+
+                    // Prüfen, ob das Buzzwords fehlt
+                    if (!currentText.toLowerCase().contains(buzzword.getName().toLowerCase()) &&
+                            !currentHeader.toLowerCase().contains(buzzword.getName().toLowerCase())) {
+
+                        // Prüfen, ob das Mapping existiert
+                        checkMappingStatement.setBytes(2, buzzwordId);
+                        ResultSet checkResult = checkMappingStatement.executeQuery();
+                        checkResult.next();
+                        int count = checkResult.getInt("count");
+
+                        if (count > 0) {
+                            deleteMappingStatement.setBytes(2, buzzwordId);
+                            deleteMappingStatement.executeUpdate();
+                            System.out.println("Deleted mapping for buzzword: " + buzzword.getName());
+                        }
+                    }
+                }
+            }
+
+            checkMappingStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void insertCollection(Collection c) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
@@ -402,50 +465,6 @@ public class Datenbank {
             e.printStackTrace();
         }
         return bwDataFromZettel;
-    }
-// Methode um zu überprüfen, ob die Buzzwords in Text und Header noch mit den Mappings in zettelBuzzwords übereinstimmen
-    public static void updateBuzzwordsForZettel(byte[] currentZettelId, ObservableList<Buzzword> bwDataFromZettel) {
-        try (Connection connection = DriverManager.getConnection(connectionString)) {
-            // Liste mit buzzwordIds dieses Zettels holen
-            List<byte[]> currentBuzzwordIds = new ArrayList<>();
-            String getBuzzwordIdsQuery = "SELECT BuzzwordId FROM zettelBuzzwords WHERE ZettelId = ?";
-            try (PreparedStatement getBuzzwordIdsStatement = connection.prepareStatement(getBuzzwordIdsQuery)) {
-                getBuzzwordIdsStatement.setBytes(1, currentZettelId);
-                ResultSet resultSet = getBuzzwordIdsStatement.executeQuery();
-
-                while (resultSet.next()) {
-                    byte[] buzzwordId = resultSet.getBytes("BuzzwordId");
-                    currentBuzzwordIds.add(buzzwordId);
-                }
-            }
-
-            // Fehlen buzzwords im Text?
-            List<byte[]> buzzwordsToRemove = new ArrayList<>();
-            for (byte[] buzzwordId : currentBuzzwordIds) {
-                boolean found = false;
-                for (Buzzword buzzword : bwDataFromZettel) {
-                    if (Arrays.equals(buzzword.getBuzzwordId(), buzzwordId)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    buzzwordsToRemove.add(buzzwordId);
-                }
-            }
-
-            // Mappings von buzzwords die nicht mehr im Text existieren löschen
-            String deleteMappingQuery = "DELETE FROM zettelBuzzwords WHERE ZettelId = ? AND BuzzwordId = ?";
-            try (PreparedStatement deleteMappingStatement = connection.prepareStatement(deleteMappingQuery)) {
-                deleteMappingStatement.setBytes(1, currentZettelId);
-                for (byte[] buzzwordId : buzzwordsToRemove) {
-                    deleteMappingStatement.setBytes(2, buzzwordId);
-                    deleteMappingStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
 //Methode um verbundene Zettel mithilfe der BuzzwordId aus der Komposittabelle zettelBuzzwords zu holen und an ListViews weiterzugeben
