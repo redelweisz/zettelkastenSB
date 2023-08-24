@@ -8,9 +8,8 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -35,7 +34,7 @@
                               <Insets bottom="5.0" top="5.0" />
                            </opaqueInsets>
                         </Label>
-                        <TextField fx:id="txtSearchBar" alignment="CENTER" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
+                        <TextField fx:id="txtSearchBar" alignment="CENTER" prefHeight="24.0" prefWidth="256.0" promptText="Search all Zettel" style="-fx-background-color: #E6EEFF;">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>
@@ -75,7 +74,8 @@
                            <contextMenu>
                               <ContextMenu>
                                 <items>
-                                  <MenuItem fx:id="ctMenuZettelLIst" mnemonicParsing="false" onAction="#initializeZettelList" text="Show All" />
+                                    <MenuItem fx:id="ctMenuZettelList" mnemonicParsing="false" onAction="#initializeZettelList" text="Show all" />
+                                    <MenuItem mnemonicParsing="false" text="Unspecified Action" />
                                 </items>
                               </ContextMenu>
                            </contextMenu></ListView>
@@ -123,21 +123,28 @@
                <children>
                   <VBox layoutX="55.0" layoutY="133.0" prefHeight="798.0" prefWidth="248.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
+                        <DatePicker fx:id="datePicker" prefHeight="24.0" prefWidth="257.0" promptText="Show Zettel from Date" showWeekNumbers="true" />
                         <Label prefHeight="24.0" prefWidth="253.0" text="Buzzwords" />
-                        <DatePicker />
-                        <MenuButton fx:id="mbShowBw" mnemonicParsing="false" onAction="#initializeBuzzwordList" prefHeight="24.0" prefWidth="276.0" text="Show Buzzwords...">
-                          <items>
-                              <RadioMenuItem id="btnShowBwZettel" fx:id="btnShowZettelBw" mnemonicParsing="false" onAction="#initializeBuzzwordFromZettelList" selected="true" text="Show Buzzwords in Zettel">
+                        <HBox prefHeight="24.0" prefWidth="253.0">
+                           <children>
+                              <RadioButton fx:id="rbShowBwInZettel" mnemonicParsing="false" onAction="#initializeBuzzwordFromZettelList" prefHeight="18.0" prefWidth="134.0" selected="true" text="Buzzwords in Zettel">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
                                  <toggleGroup>
-                                    <ToggleGroup fx:id="tgBw" />
+                                    <ToggleGroup fx:id="showBw" />
                                  </toggleGroup>
-                              </RadioMenuItem>
-                              <RadioMenuItem id="btnShowAllBw" fx:id="btnShowAllBw" mnemonicParsing="false" onAction="#initializeBuzzwordList" text="Show all Buzzwords" toggleGroup="$tgBw" />
-                          </items>
-                        </MenuButton>
-                        <ListView fx:id="buzzwordList" prefHeight="315.0" prefWidth="253.0" />
+                              </RadioButton>
+                              <RadioButton fx:id="rbShowBw" mnemonicParsing="false" onAction="#initializeBuzzwordList" prefHeight="18.0" prefWidth="130.0" text="Show all Buzzwords" toggleGroup="$showBw">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </RadioButton>
+                           </children>
+                        </HBox>
+                        <ListView fx:id="buzzwordList" prefHeight="331.0" prefWidth="253.0" />
                         <Label prefHeight="24.0" prefWidth="255.0" text="Zettel containing Buzzword:" />
-                        <ListView fx:id="zettelBuzzwordList" prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="zettelBuzzwordList" prefHeight="330.0" prefWidth="253.0" />
                         <TextField fx:id="txtFieldCollectionName" promptText="Enter a Name for your Collection" />
                         <Button fx:id="btnCreateCollectionFromSelected" mnemonicParsing="false" onAction="#handleCreateCollection" prefHeight="24.0" prefWidth="253.0" text="Group selected Zettel in Collection" />
                      </children>

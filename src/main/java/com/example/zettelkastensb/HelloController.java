@@ -55,17 +55,19 @@ public class HelloController {
     @FXML
     private ListView<Collection> collectionList;
     @FXML
-    private MenuButton mbShowBw;
+    private RadioButton rbShowBw;
     @FXML
-    private RadioMenuItem btnShowAllBw;
-    @FXML
-    private RadioMenuItem btnShowZettelBw;
+    private RadioButton rbShowBwInZettel;
     @FXML
     private Button btnCreateCollectionFromSelected;
     @FXML
     private Button btnDeleteZettel;
     @FXML
     private Button btnRemoveFromCollection;
+    @FXML
+    private MenuItem ctMenuZettelList;
+    @FXML
+    private DatePicker datePicker;
 
 
 
@@ -173,6 +175,7 @@ public class HelloController {
             Datenbank.insertBuzzword(b);
             System.out.println("New Buzzword generated");
             currentBuzzwordId = b.getBuzzwordId(); // Speichere die aktuelle BuzzwordId in der Variable
+            initializeZettelBuzzwordList();
         }
     }
 //Methode um per Button New Collection und Eingabedialog eine neue Collection zu erstellen
@@ -398,9 +401,28 @@ public class HelloController {
 
         zettelList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             btnRemoveFromCollection.setDisable(newValue == null || collectionList.getSelectionModel().isEmpty());
+            // & Listener auf LV zetteList um bei Zettelwechsel für ToggleGroup showBw rbShowZettelBw auszuwählen
+                    if (newValue != null) {
+                        rbShowBwInZettel.setSelected(true);}
         });
 
+        // Listener auf Datepicker, um Zettel mit gewähltem Erstellungsdatum anzuzeigen
+        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                try {
+                    // Query the database to get zettels created on the selected date
+                    ObservableList<Zettel> zettels = Datenbank.getZettelsByDate(newValue);
+
+                    // Update the zettelList with the retrieved zettels
+                    zettelList.setItems(zettels);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
+
+
     //Methode um die ListView ZettelList mit den Zetteln der ausgewählten Collection zu befüllen
     @FXML
     private void updateZettelListForCollection(byte[] collectionId) {
@@ -458,6 +480,8 @@ public class HelloController {
 
     //ListView mit Zetteln befüllen
     public void initializeZettelList() {
+        // DatePicker zurücksetzen
+        datePicker.setValue(null);
         // Zetteldaten aus Datenbank holen und zur Liste hinzufügen
         zettelList.setItems(zettelData);
 

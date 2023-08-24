@@ -141,15 +141,14 @@ public class Datenbank {
                 String text = resultSet.getString("Text");
                 String dateString = resultSet.getString("Date");
 
-                LocalDate date = null; // Initialize with a default value or null
+                LocalDate date = null;
                 try {
-                    // Parse the date if the dateString is not null or empty
+                    // Falls Datenstring null oder leer ist, Datum parsen
                     if (dateString != null && !dateString.isEmpty()) {
                         date = LocalDate.parse(dateString, dateFormatter);
                         System.out.println("Date parsed");
                     }
                 } catch (DateTimeParseException ex) {
-                    // Handle the exception, log an error, or provide a default value
                     System.out.println("?");
                 }
                 Zettel zettel = new Zettel();
@@ -163,6 +162,7 @@ public class Datenbank {
         }
         return searchResults;
     }
+    // Methode um zu überprüfen, ob bekannte buzzwords im Text vorkommen
     public static void checkForBuzzwords(Buzzword b, byte[] currentZettelId) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
             // In headers und text nach buzzword suchen
@@ -403,7 +403,7 @@ public class Datenbank {
         }
         return bwDataFromZettel;
     }
-
+// Methode um zu überprüfen, ob die Buzzwords in Text und Header noch mit den Mappings in zettelBuzzwords übereinstimmen
     public static void updateBuzzwordsForZettel(byte[] currentZettelId, ObservableList<Buzzword> bwDataFromZettel) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
             // Liste mit buzzwordIds dieses Zettels holen
@@ -560,6 +560,41 @@ public class Datenbank {
             preparedStatement.executeUpdate();
         }
     }
+// Methode um Zettel nach Erstellungsdatum zu suchen, und an zettelList zu übergeben
+    public static ObservableList<Zettel> getZettelsByDate(LocalDate date) throws SQLException {
+        ObservableList<Zettel> zettelOfDate = FXCollections.observableArrayList();
+
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            String searchQuery = "SELECT ZettelId, Header, Text, Date FROM zettel WHERE Date = ?";
+            PreparedStatement searchStatement = connection.prepareStatement(searchQuery);
+
+            // Datumsformat anpassen
+            String dateString = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            searchStatement.setString(1, dateString);
+            ResultSet resultSet = searchStatement.executeQuery();
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            while (resultSet.next()) {
+                byte[] zettelId = resultSet.getBytes("ZettelId");
+                String header = resultSet.getString("Header");
+                String text = resultSet.getString("Text");
+                String retrievedDateString = resultSet.getString("Date");
+
+                LocalDate retrievedDate = LocalDate.parse(retrievedDateString, dateFormatter);
+
+                Zettel zettel = new Zettel();
+                zettel.setZettelId(zettelId);
+                zettel.setHeader(header);
+                zettel.setText(text);
+                zettel.setDate(retrievedDate);
+
+                zettelOfDate.add(zettel);
+            }
+        }
+        return zettelOfDate;
+    }
+
     //Methode um zettelBuzzwordId zu generieren
     public static byte[] generateZettelBuzzwordId() {
         UUID uuid = UUID.randomUUID();
@@ -576,7 +611,6 @@ public class Datenbank {
         byteBuffer.putLong(uuid.getLeastSignificantBits());
         return byteBuffer.array();
     }
-
 
 }
 
