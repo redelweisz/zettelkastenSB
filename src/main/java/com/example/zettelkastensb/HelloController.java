@@ -89,8 +89,8 @@ public class HelloController {
             Datenbank.insertZettel(z);
             System.out.println("New Zettel generated");
             currentZettelId = z.getZettelId(); // Speichere die aktuelle ZettelId in der Variable
-            zettelData.add(z); // Add the new Zettel to the zettelData list
-            zettelList.getSelectionModel().select(z); // Select the newly added Zettel in the ListView
+            zettelData.add(z);
+            zettelList.getSelectionModel().select(z);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -162,7 +162,7 @@ public class HelloController {
         // Prüfen ob BW bereits existiert
         String selectedBuzzword = selected;
 
-        // Check if the buzzword already exists in bwData
+        // Existiert das BW in bwData?
         boolean buzzwordExists = bwData.stream()
                 .anyMatch(buzzword -> buzzword.getName().equalsIgnoreCase(selectedBuzzword));
 
@@ -220,6 +220,7 @@ public class HelloController {
         dialog.showAndWait();
         initializeCollectionList();
     }
+    // Methode um ausgewählte Collection zu löschen
     @FXML
     void deleteCollection(ActionEvent event) {
         Collection selectedCollection = collectionList.getSelectionModel().getSelectedItem();
@@ -289,8 +290,6 @@ public class HelloController {
         }
     }
 
-
-
     //Methode um Alert anzuzeigen
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
@@ -299,7 +298,6 @@ public class HelloController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
     //Ausgewählten Text aus der TextArea in String speichern
     @FXML
@@ -312,6 +310,7 @@ public class HelloController {
             System.out.println("selected text saved as string");
         }
     }
+    // Volltextsuche
     public void search(String searchText){
         try {
             // Call the searchZettelByText method with the new search text
@@ -393,7 +392,7 @@ public class HelloController {
         // RemoveFromCollectionButton disablen
         btnRemoveFromCollection.setDisable(true);
 
-// Listener um Button zu enablen, wenn beides ausgewählt wurde
+        // Listener um Button zu enablen, wenn beides ausgewählt wurde
         collectionList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             btnRemoveFromCollection.setDisable(newValue == null || zettelList.getSelectionModel().isEmpty());
         });
@@ -420,7 +419,6 @@ public class HelloController {
             }
         });
     }
-
 
     //Methode um die ListView ZettelList mit den Zetteln der ausgewählten Collection zu befüllen
     @FXML
