@@ -375,7 +375,7 @@ public class HelloController {
             zettelData.setAll(Datenbank.getZettelData());
             zettelList.setItems(zettelData);
             initializeZettelList();
-            initializeZettelBuzzwordList();
+            //initializeZettelBuzzwordList();
             bwData.setAll(Datenbank.getBwData());
             initializeCollectionList();
 
