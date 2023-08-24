@@ -1,6 +1,9 @@
 package zettelkasten;
 
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,45 +15,56 @@ public class Zettel {
 
     private byte[] zettelId;
 
-    private String header;
-    private String text;
+    private StringProperty headerProperty = new SimpleStringProperty();
+    private StringProperty textProperty = new SimpleStringProperty();
+
     private LocalDate date;
     public ArrayList<Buzzword> buzzword;
 
     public Zettel() {
     }
 
+
     public Zettel(LocalDate date, ArrayList<Buzzword> buzzword) {
         this.zettelId = generateZettelId();
-        this.header = "Type something";
-        this.text = "Type something";
+        this.headerProperty.set("Type something");
+        this.textProperty.set("Type something");
         this.date = date;
         this.buzzword = buzzword;
     }
 
     public Zettel(byte[] zettelId, String header, String text, LocalDate date) {
         this.zettelId = zettelId;
-        this.header = header;
-        this.text = text;
+        this.headerProperty.set(header);
+        this.textProperty.set(text);
         this.date = date;
         buzzword = new ArrayList<>();
     }
 
+    public StringProperty headerProperty() {
+        return headerProperty;
+    }
+
     public String getHeader() {
-        return header;
+        return headerProperty.get();
     }
 
     public void setHeader(String header) {
-        this.header = header;
+        headerProperty.set(header);
+    }
+
+    public StringProperty textProperty() {
+        return textProperty;
     }
 
     public String getText() {
-        return text;
+        return textProperty.get();
     }
 
     public void setText(String text) {
-        this.text = text;
+        textProperty.set(text);
     }
+
 
     public LocalDate getDate() {
         return date;
@@ -88,8 +102,8 @@ public class Zettel {
     @Override
     public String toString() {
         return "Zettel{" +
-                "header='" + header + '\'' +
-                ", text='" + text + '\'' +
+                "header='" + headerProperty.get() + '\'' +
+                ", text='" + textProperty.get() + '\'' +
                 '}';
     }
 

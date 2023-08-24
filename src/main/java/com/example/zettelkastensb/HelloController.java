@@ -1,5 +1,6 @@
 package com.example.zettelkastensb;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -372,11 +373,23 @@ public class HelloController {
     @FXML
     public void initialize() {
             zettelData.setAll(Datenbank.getZettelData());
-            zettelList.setItems(zettelData);
             initializeZettelList();
             bwData.setAll(Datenbank.getBwData());
             initializeCollectionList();
-
+// Listener to update zettelData when headerZettel changes
+        headerZettel.textProperty().addListener((observable, oldValue, newValue) -> {
+            Zettel selectedZettel = zettelList.getSelectionModel().getSelectedItem();
+            if (selectedZettel != null) {
+                selectedZettel.setHeader(newValue);
+            }
+        });
+        // Listener to update zettelData when textZettel changes
+        textZettel.textProperty().addListener((observable, oldValue, newValue) -> {
+            Zettel selectedZettel = zettelList.getSelectionModel().getSelectedItem();
+            if (selectedZettel != null) {
+                selectedZettel.setText(newValue);
+            }
+        });
 // Listener für die search bar
         txtSearchBar.textProperty().addListener((observable, oldValue, searchText) -> {
             search(searchText);
@@ -533,7 +546,7 @@ public class HelloController {
             zettelList.getSelectionModel().select(0);
     }
     //Zetteldaten in Datenbank updaten
-    public void updateZettelInDatabase() {
+    /*public void updateZettelInDatabase() {
         String header = getHeaderZettelText();
         String text = getTextZettelText();
         if (currentZettelId != null) {
@@ -554,12 +567,25 @@ public class HelloController {
             }
         }
     }
+
+     */
     //Zetteländerungen beim Tippen speichern
     @FXML
     void saveOnChangeZettel(KeyEvent event){
-        if (currentZettelId != null) { // Überprüfe, ob eine aktuelle ZettelId vorhanden ist
-            updateZettelInDatabase();
+        if (currentZettelId != null) {
             checkForBuzzwordsInCurrentZettel(currentZettelId);
+
+            Zettel zettelToUpdate = zettelData.stream()
+                    .filter(z -> Arrays.equals(z.getZettelId(), currentZettelId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (zettelToUpdate != null) {
+                zettelToUpdate.setHeader(getHeaderZettelText());
+                zettelToUpdate.setText(getTextZettelText());
+
+                Platform.runLater(() -> zettelList.refresh()); // Refresh the UI
+            }
         }
     }
 
