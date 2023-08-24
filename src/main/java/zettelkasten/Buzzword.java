@@ -1,21 +1,24 @@
 package zettelkasten;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class Buzzword {
 
     private byte[] buzzwordId;
-    private String name;
+    private StringProperty nameProperty = new SimpleStringProperty();
 
     public Buzzword(String name) {
         this.buzzwordId = generateBuzzwordId();
-        this.name = name;
+        this.nameProperty.set(name);
     }
 
     public Buzzword(byte[] buzzwordId, String name) {
         this.buzzwordId = buzzwordId;
-        this.name = name;
+        this.nameProperty.set(name);
     }
 
     public byte[] getBuzzwordId() {
@@ -28,21 +31,23 @@ public class Buzzword {
         this.buzzwordId = buzzwordId;
     }
 
-    public String getName() {
+    public StringProperty nameProperty() {
+        return nameProperty;
+    }
 
-        return name;
+    public String getName() {
+        return nameProperty.get();
     }
 
     public void setName(String name) {
-
-        this.name = name;
+        nameProperty.set(name);
     }
 
     @Override
     public String toString() {
-
-        return name;
+        return getName();
     }
+
 
     // Id-Generator
     public byte[] generateBuzzwordId() {
