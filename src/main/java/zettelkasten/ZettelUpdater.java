@@ -22,6 +22,4 @@ public class ZettelUpdater {
             System.out.println("Error updating zettel: " + e.getMessage());
         }
     }
-
-
 }

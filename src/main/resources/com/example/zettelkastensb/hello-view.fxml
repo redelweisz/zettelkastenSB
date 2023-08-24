@@ -35,7 +35,7 @@
                               <Insets bottom="5.0" top="5.0" />
                            </opaqueInsets>
                         </Label>
-                        <TextField alignment="CENTER" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
+                        <TextField fx:id="txtSearchBar" alignment="CENTER" prefHeight="24.0" prefWidth="256.0" promptText="search" style="-fx-background-color: #E6EEFF;">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>
@@ -66,16 +66,32 @@
                               </Button>
                            </children>
                         </HBox>
-                        <Label text="Zettel" />
-                        <ListView fx:id="zettelList" prefHeight="732.0" prefWidth="253.0" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label prefHeight="16.0" prefWidth="256.0" text="Zettel (Right Click to show all)" />
+                           </children>
+                        </HBox>
+                        <ListView fx:id="zettelList" prefHeight="732.0" prefWidth="253.0">
+                           <contextMenu>
+                              <ContextMenu>
+                                <items>
+                                  <MenuItem fx:id="ctMenuZettelLIst" mnemonicParsing="false" onAction="#initializeZettelList" text="Show All" />
+                                </items>
+                              </ContextMenu>
+                           </contextMenu></ListView>
                         <HBox prefHeight="24.0" prefWidth="256.0">
                            <children>
-                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#newZettel" prefWidth="128.0" text="New Zettel">
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#newZettel" prefHeight="20.0" prefWidth="87.0" text="New Zettel">
                                  <font>
                                     <Font size="10.0" />
                                  </font>
                               </Button>
-                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#deleteZettel" prefWidth="128.0" text="Delete Zettel">
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#deleteZettel" prefHeight="20.0" prefWidth="96.0" text="Delete Zettel">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnRemoveFromCollection" mnemonicParsing="false" onAction="#removeFromCollection" text="Remove f. Collection">
                                  <font>
                                     <Font size="10.0" />
                                  </font>

@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,7 +122,47 @@ public class Datenbank {
             e.printStackTrace();
         }
     }
+    // Methode um DB nach Zetteln mit dem gesuchten Text zu durchsuchen, und eine OL an die ListView zu liefern.
+    public static ObservableList<Zettel> searchZettelByText(String searchText) throws SQLException {
+        ObservableList<Zettel> searchResults = FXCollections.observableArrayList();
+        System.out.println("Arraylist created");
 
+        try (Connection connection = DriverManager.getConnection(connectionString)) {
+            String searchQuery = "SELECT DISTINCT ZettelId, Header, Text, Date FROM zettel WHERE (Header LIKE ? OR Text LIKE ?)";
+            PreparedStatement searchStatement = connection.prepareStatement(searchQuery);
+            searchStatement.setString(1, "%" + searchText + "%");
+            searchStatement.setString(2, "%" + searchText + "%");
+            ResultSet resultSet = searchStatement.executeQuery();
+            System.out.println("Query executed");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            while (resultSet.next()) {
+                byte[] zettelId = resultSet.getBytes("ZettelId");
+                String header = resultSet.getString("Header");
+                String text = resultSet.getString("Text");
+                String dateString = resultSet.getString("Date");
+
+                LocalDate date = null; // Initialize with a default value or null
+                try {
+                    // Parse the date if the dateString is not null or empty
+                    if (dateString != null && !dateString.isEmpty()) {
+                        date = LocalDate.parse(dateString, dateFormatter);
+                        System.out.println("Date parsed");
+                    }
+                } catch (DateTimeParseException ex) {
+                    // Handle the exception, log an error, or provide a default value
+                    System.out.println("?");
+                }
+                Zettel zettel = new Zettel();
+                zettel.setZettelId(zettelId);
+                zettel.setHeader(header);
+                zettel.setText(text);
+                zettel.setDate(date);
+                System.out.println("Zettel Found");
+                searchResults.add(zettel);
+            }
+        }
+        return searchResults;
+    }
     public static void checkForBuzzwords(Buzzword b, byte[] currentZettelId) {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
             // In headers und text nach buzzword suchen
@@ -483,6 +524,42 @@ public class Datenbank {
         }
         return null; // Return null if the Buzzword with the given ID is not found
     }
+
+    //Methode um Zettel aus zettelCollections-DB zu holen und an ListViews weiterzugeben
+    public static ObservableList<Zettel> loadZettelFromCollection(byte[] collectionId) {
+        ObservableList<Zettel> collectionZettel =  FXCollections.observableArrayList();
+
+        try (Connection conn = DriverManager.getConnection(connectionString)) {
+
+            String fetchCollectionZettelQuery = "SELECT * FROM zettelCollections WHERE CollectionId = ?";
+            try (PreparedStatement fetchCollectionZettelStmt = conn.prepareStatement(fetchCollectionZettelQuery)) {
+                fetchCollectionZettelStmt.setBytes(1, collectionId);
+                ResultSet resultSet = fetchCollectionZettelStmt.executeQuery();
+
+                while (resultSet.next()) {
+                    byte[] zettelId = resultSet.getBytes("ZettelId");
+                    // Zettel mithilfe von zettelId holen und zu collectionZettel hinzufügen
+                    Zettel zettel = fetchZettelById(zettelId);
+                    if (zettel != null) {
+                        collectionZettel.add(zettel);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return collectionZettel;
+    }
+    // Methode um Zettel aus zettelCollections zu entfernen
+    public static void removeZettelFromCollection(byte[] zettelId) throws SQLException {
+        String sql = "DELETE FROM ZettelCollections WHERE ZettelId = ?";
+        try (Connection connection = DriverManager.getConnection(connectionString);
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setBytes(1, zettelId);
+            preparedStatement.executeUpdate();
+        }
+    }
     //Methode um zettelBuzzwordId zu generieren
     public static byte[] generateZettelBuzzwordId() {
         UUID uuid = UUID.randomUUID();
@@ -502,26 +579,4 @@ public class Datenbank {
 
 
 }
-
-    /*public static Zettel readZettel(byte[] zettelId){
-        try (Connection connection = DriverManager.getConnection(connectionString)) {
-            String query = "SELECT * FROM zettel WHERE ZettelId = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setBytes(1, zettelId);
-            ResultSet rs = statement.executeQuery();
-
-            if(rs.next()){
-                Zettel z =  new Zettel(rs.getBytes("ZettelId"), rs.getString("Header"), rs.getString("Text"),
-                        LocalDate.parse(rs.getString("Date"), DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
-            }
-
-
-            // schließen
-            statement.close();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-*/
 

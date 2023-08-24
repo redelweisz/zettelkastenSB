@@ -6,7 +6,6 @@ import java.util.UUID;
 public class Buzzword {
 
     private byte[] buzzwordId;
-
     private String name;
 
     public Buzzword(String name) {
@@ -20,23 +19,28 @@ public class Buzzword {
     }
 
     public byte[] getBuzzwordId() {
+
         return buzzwordId;
     }
 
     public void setBuzzwordId(byte[] buzzwordId) {
+
         this.buzzwordId = buzzwordId;
     }
 
     public String getName() {
+
         return name;
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
     @Override
     public String toString() {
+
         return name;
     }
 
