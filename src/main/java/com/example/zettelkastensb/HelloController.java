@@ -1,5 +1,6 @@
 package com.example.zettelkastensb;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -374,6 +375,7 @@ public class HelloController {
             zettelData.setAll(Datenbank.getZettelData());
             zettelList.setItems(zettelData);
             initializeZettelList();
+            initializeZettelBuzzwordList();
             bwData.setAll(Datenbank.getBwData());
             initializeCollectionList();
 
@@ -560,6 +562,8 @@ public class HelloController {
         if (currentZettelId != null) { // Überprüfe, ob eine aktuelle ZettelId vorhanden ist
             updateZettelInDatabase();
             checkForBuzzwordsInCurrentZettel(currentZettelId);
+
+            Platform.runLater(() -> zettelList.refresh());
         }
     }
 
