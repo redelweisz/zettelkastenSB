@@ -1,6 +1,7 @@
 BENUTZER_INNENHANDBUCH ZETTELKASTEN (english below)
 
 
+
 ein Projekt von Caspar N. Rode
 
 
@@ -86,6 +87,7 @@ Wenn Sie sich einen Überblick verschaffen möchten, was sie an welchem Datum ge
 
 
 Ich wünsche Ihnen tolles Arbeiten und viel Inspiration mit dem Zettelkasten.
+
 
 
 Herzlich 
@@ -208,7 +210,9 @@ I wish you great work and lots of inspiration with the Zettelkasten.
 
 
 
+
 Sincerely 
+
 
 Caspar N. Rode
 
