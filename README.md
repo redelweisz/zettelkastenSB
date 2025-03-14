@@ -33,9 +33,9 @@ ________________________________________________________________________________
 Herzlich Willkommen zu Ihrem Zettelkasten. Im folgenden möchte ich Sie in ein paar Schritten mit den Funktionen vertraut machen.
 
 
-Zettelkasten ist ein Programm, das Ihnen helfen kann ihre Notizen, Gedanken und Texte zu überblicken, und zusammenzuführen, was zusammengehört. Erstellen sie Schlagworte in ihren Notizen und sehen sie sofort, wann sie schon einmal über das Thema geschrieben haben. Anschliessend könne sie ihre Zettel auch zu Sammlungen Zusammfassen.
+Zettelkasten ist ein Programm, das Ihnen helfen kann ihre Notizen, Gedanken und Texte zu überblicken, und zusammenzuführen, was zusammengehört. Erstellen Sie Schlagworte in ihren Notizen und sehen Sie sofort, wann Sie schon einmal über das Thema geschrieben haben. Anschliessend könne Sie ihre Zettel auch zu Sammlungen Zusammfassen.
 
-Lassen sie uns beginnen.
+Lassen Sie uns beginnen.
 
 
 
@@ -43,47 +43,47 @@ Lassen sie uns beginnen.
 
 1. Einen Zettel erstellen:
 
-Hauptfenster. Mit einem Klick auf die Schaltfläche ‚New Zettel‘ unten links, erstellen sie Ihren ersten Zettel. Er erscheint auch sofort in der Übersicht aller Zettel direkt darüber. Wenn sie später einen Zettel wieder löschen wollen, finden sie direkt daneben die Schaltfläche ‚Delete Zettel‘. Gelöscht wird immer der Zettel, der in der Zettel-Liste markiert ist. Wenn sie ‚Delete Zettel‘ klicken, erscheint ein Dialogfenster. Wenn sie hier mit OK bestätigen wird der Zettel gelöscht. Achtung: Gelöschte Zettel sind unwiederbringlich verschwunden.
+Hauptfenster. Mit einem Klick auf die Schaltfläche ‚New Zettel‘ unten links, erstellen Sie Ihren ersten Zettel. Er erscheint auch sofort in der Übersicht aller Zettel direkt darüber. Wenn Sie später einen Zettel wieder löschen wollen, finden sie direkt daneben die Schaltfläche ‚Delete Zettel‘. Gelöscht wird immer der Zettel, der in der Zettel-Liste markiert ist. Wenn Sie ‚Delete Zettel‘ klicken, erscheint ein Dialogfenster. Wenn Sie hier mit OK bestätigen wird der Zettel gelöscht. Achtung: Gelöschte Zettel sind unwiederbringlich verschwunden.
 
 
 2. Einen Zettel mit Inhalt befüllen:
 
-Mit einem Klick in das Entsprechende Textfeld können sie die Überschrift und den Inhalt ihres Zettels verändern. Geben sie nun einfach den gewünschten Text ein. Alle Ihre Eingaben werden automatisch gespeichert. Sie können zwischendurch getrost durch Ihre Zettel und Sammlungen browsen, und jederzeit zur Bearbeitung ihres Zettels zurückkehren. 
+Mit einem Klick in das Entsprechende Textfeld können Sie die Überschrift und den Inhalt ihres Zettels verändern. Geben Sie nun einfach den gewünschten Text ein. Alle Ihre Eingaben werden automatisch gespeichert. Sie können zwischendurch getrost durch Ihre Zettel und Sammlungen browsen, und jederzeit zur Bearbeitung ihres Zettels zurückkehren. 
 
 
 3. Ein Buzzword erstellen:
 
-Buzzwords, oder Schlagworte sind das Herz des Zettelkastens. Sie sorgen dafür, dass Sie einen Überblick über Zettel mit ähnlichem Inhalt bekommen. Wann immer sie glauben, ein Begriff ist besonders wichtig für Ihre Arbeit, oder sehen wollen, wo sie über das Selbe schon einmal geschrieben haben, markieren sie mit der Maus ein Wort im Text, und klicken sie mit der rechten Maustaste darauf. Im Kontextmenü klicken sie auf ‚Create Buzzword‘.
+Buzzwords, oder Schlagworte sind das Herz des Zettelkastens. Sie sorgen dafür, dass Sie einen Überblick über Zettel mit ähnlichem Inhalt bekommen. Wann immer Sie glauben, ein Begriff ist besonders wichtig für Ihre Arbeit, oder sehen wollen, wo Sie über das Selbe schon einmal geschrieben haben, markieren Sie mit der Maus ein Wort im Text, und klicken Sie mit der rechten Maustaste darauf. Im Kontextmenü klicken Sie auf ‚Create Buzzword‘.
 
 
 4. Buzzwords anzeigen:
 
-Auf der rechten Seite finden Sie das Buzzword-Menü. Die Standardeinstellung zeigt Ihnen eine Liste der Buzzwords im ausgewählten Zettel. Wenn sie eines davon auswählen, werden Ihnen in der Liste darunter alle Zettel angezeigt, die dieses Buzzword enthalten. Wenn sie oben die Schaltfläche ‚Show all Buzzwords‘ anwählen, wird Ihnen die gesamte Liste gespeicherter Buzzwords angezeigt. Auch hier können sie eines auswählen, und dann die Zettel sehen, die dieses enthalten.
+Auf der rechten Seite finden Sie das Buzzword-Menü. Die Standardeinstellung zeigt Ihnen eine Liste der Buzzwords im ausgewählten Zettel. Wenn Sie eines davon auswählen, werden Ihnen in der Liste darunter alle Zettel angezeigt, die dieses Buzzword enthalten. Wenn Sie oben die Schaltfläche ‚Show all Buzzwords‘ anwählen, wird Ihnen die gesamte Liste gespeicherter Buzzwords angezeigt. Auch hier können Sie eines auswählen, und dann die Zettel sehen, die dieses enthalten.
 
 
 5. Eine Collection erstellen, anzeigen, bearbeiten oder löschen:
 
-Wählen sie beliebig viele dieser Buzzwords aus, geben sie einen treffenden Namen in der Textzeile darunter ein, und klicken sie auf ‚Group selected Zettel in Collection‘. Glückwunsch! Sie haben Ihre erste Sammlung erstellt.
+Wählen Sie beliebig viele dieser Buzzwords aus, geben Sie einen treffenden Namen in der Textzeile darunter ein, und klicken Sie auf ‚Group selected Zettel in Collection‘. Glückwunsch! Sie haben Ihre erste Sammlung erstellt.
 
-Wollen Sie sich ihre Collection nun anzeigen lassen, klicken Sie einfach oben links auf die Schaltfläche Collections, hierdurch faltet sich die Collections-Liste auf. Wählen sie eine Collection aus, Springt die Ansicht der Zettelliste darunter um, und zeigt Ihnen nur noch die Zettel in der ausgewählten Collection an. Mit ‚Delete Collection‘ können sie die ganze Collection löschen. Wenn sie nur einen Zettel nicht mehr in der Collection wünschen, wählen sie diesen nun in der Liste aus, und klicken sie am unteren Rand des Fensters auf ‚Remove f. Collection‘. 
+Wollen Sie sich ihre Collection nun anzeigen lassen, klicken Sie einfach oben links auf die Schaltfläche Collections, hierdurch faltet sich die Collections-Liste auf. Wählen Sie eine Collection aus, Springt die Ansicht der Zettelliste darunter um, und zeigt Ihnen nur noch die Zettel in der ausgewählten Collection an. Mit ‚Delete Collection‘ können Sie die ganze Collection löschen. Wenn Sie nur einen Zettel nicht mehr in der Collection wünschen, wählen Sie diesen nun in der Liste aus, und klicken Sie am unteren Rand des Fensters auf ‚Remove f. Collection‘. 
 
-Hier haben Sie übrigens auch die Möglichkeit Collections unabhängig von ihren Buzzwords zu erstellen. Klicken sie einfach unter der Collections-Liste auf ‚new Collection‘, und es öffnet sich ein Dialogmenü, in dem sie aus allen Zetteln wählen können. Geben sie einfach den gewünschten Namen der Collection in die Textzeile ein, und klicken sie ‚Create Collection‘, wenn sie alle gewünschten Zettel ausgewählt haben. (Siehe Abb. Auf der nächsten Seite)
+Hier haben Sie übrigens auch die Möglichkeit Collections unabhängig von ihren Buzzwords zu erstellen. Klicken Sie einfach unter der Collections-Liste auf ‚new Collection‘, und es öffnet sich ein Dialogmenü, in dem Sie aus allen Zetteln wählen können. Geben Sie den gewünschten Namen der Collection in die Textzeile ein, und klicken sie ‚Create Collection‘, wenn Sie alle gewünschten Zettel ausgewählt haben. (Siehe Abb. Auf der nächsten Seite)
 
 
 6. Zur Liste aller Zettel zurückkehren:
 
-Mit einem Rechtsklick in die Zettelliste, und einem Klick auf ‚Show all‘ kommen sie wieder in die Normalansicht der Zettelliste zurück. Dies gilt übrigens auch, wenn sie die Suche benutzt haben, oder sich die Zettel einzelner Tage anzeigen lassen haben.
+Mit einem Rechtsklick in die Zettelliste, und einem Klick auf ‚Show all‘ kommen Sie wieder in die Normalansicht der Zettelliste zurück. Dies gilt übrigens auch, wenn Sie die Suche benutzt haben, oder sich die Zettel einzelner Tage anzeigen lassen haben.
 
 
 7. Zettel anhand von Text dursuchen:
 
-Oben links finden Sie die Suchfunktion. Möchten sie Ihre Zettel nach einem bestimmten Wort oder Zeichenkombination durchsuchen, geben sie diese oben links in die Textzeile ein. Die Ansicht der Zettel-Liste springt daraufhin um, um Ihnen nur die Zettel, die das entsprechende Ergebnis enthalten anzuzeigen.
-Wenn sie diese Ansicht wieder beenden wollen, klicken sie wie gewohnt rechts in die Zettel-Liste, und wählen sie ‚Show all‘ im Kontextmenü.
+Oben links finden Sie die Suchfunktion. Möchten Sie Ihre Zettel nach einem bestimmten Wort oder Zeichenkombination durchsuchen, geben Sie diese oben links in die Textzeile ein. Die Ansicht der Zettel-Liste springt daraufhin um, um Ihnen nur die Zettel, die das entsprechende Ergebnis enthalten anzuzeigen.
+Wenn Sie diese Ansicht wieder beenden wollen, klicken Sie wie gewohnt rechts in die Zettel-Liste, und wählen Sie ‚Show all‘ im Kontextmenü.
 
 
 8. Zettel nach Datum anzeigen lassen:
 
-Wenn Sie sich einen Überblick verschaffen möchten, was sie an welchem Datum geschrieben haben, klicken Sie auf die Datumszeile in der rechten oberen ecke des Hauptfensters. Hierdurch eröffnet sich ein Kalenderblatt. Wählen sie im gewünschten Monat ein Datum aus. In der Zettel-Liste werden Ihnen nun ausschließlich die Zettel die an diesem Datum erstellt wurden angezeigt. Beenden sie diese Ansicht wie gewohnt mit einem Rechtsklick in die Liste, und wählen sie ‚Show all‘ im Kontextmenü.
+Wenn Sie sich einen Überblick verschaffen möchten, was Sie an welchem Datum geschrieben haben, klicken Sie auf die Datumszeile in der rechten oberen ecke des Hauptfensters. Hierdurch eröffnet sich ein Kalenderblatt. Wählen sie im gewünschten Monat ein Datum aus. In der Zettel-Liste werden Ihnen nun ausschließlich die Zettel die an diesem Datum erstellt wurden angezeigt. Beenden Sie diese Ansicht wie gewohnt mit einem Rechtsklick in die Liste, und wählen Sie ‚Show all‘ im Kontextmenü.
 
 
 Ich wünsche Ihnen tolles Arbeiten und viel Inspiration mit dem Zettelkasten.
